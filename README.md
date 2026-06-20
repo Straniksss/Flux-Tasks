@@ -1,38 +1,33 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Flux Tasks" width="220">
+  <img src="assets/banner.png" alt="Flux Tasks Banner">
 </p>
 
-<h1 align="center">Flux Tasks</h1>
+<div align="center">
 
-<p align="center">
-  ✨ Premium Offline Project Manager
-</p>
+# Flux Tasks
 
-<p align="center">
-  Tasks • Roadmaps • Releases • Documentation • AI Prompts
-</p>
+### ✨ Premium Offline Project Manager
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Electron-Latest-blue?style=for-the-badge">
-  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge">
-  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge">
-  <img src="https://img.shields.io/badge/SQLite-Local-003B57?style=for-the-badge">
-</p>
+Tasks • Roadmaps • Releases • Documentation • AI Prompts
+
+<br>
+
+<img src="https://img.shields.io/github/stars/Straniksss/Flux?style=for-the-badge">
+<img src="https://img.shields.io/github/license/Straniksss/Flux?style=for-the-badge">
+<img src="https://img.shields.io/github/last-commit/Straniksss/Flux?style=for-the-badge">
+
+</div>
 
 ---
 
 ## 🚀 About
 
-Flux Tasks is a modern desktop application designed for developers, teams and creators who want complete control over their projects without relying on cloud services.
+Flux Tasks is a premium offline project management application designed for developers and creators.
 
 Everything is stored locally.
 
-✔ Offline First
-✔ No Cloud Required
-✔ No Subscription
-✔ No Accounts
-✔ No Tracking
-✔ Fast & Private
+No cloud. No subscriptions. No tracking.
+
 
 ---
 
