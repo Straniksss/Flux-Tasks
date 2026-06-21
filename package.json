@@ -1,0 +1,66 @@
+{
+  "name": "flux-tasks",
+  "productName": "Flux Tasks",
+  "private": true,
+  "version": "1.1.17",
+  "type": "commonjs",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build:frontend": "vite build",
+    "build:electron": "esbuild electron/main.ts --bundle --platform=node --external:electron --outfile=dist-electron/main.js && esbuild electron/preload.ts --bundle --platform=node --external:electron --outfile=dist-electron/preload.js",
+    "build": "npm run build:frontend && npm run build:electron && electron-builder --win",
+    "package": "npm run build",
+    "release": "node scripts/release.js",
+    "upload-release": "node scripts/upload-release.js",
+    "clean": "rm -rf dist dist-electron release",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "vite": "^6.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "autoprefixer": "^10.4.21",
+    "electron": "^42.4.1",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.25.0",
+    "tailwindcss": "^4.1.14",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.3"
+  },
+  "build": {
+    "appId": "com.flux.tasks",
+    "productName": "Flux Tasks",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Flux Tasks",
+      "artifactName": "Flux Tasks Setup.${ext}"
+    }
+  }
+}
