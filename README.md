@@ -135,8 +135,6 @@ Installing Flux Tasks is quick and simple.
 3. **Start Organizing**:
    Open the app from your Desktop or Start Menu and begin managing your projects offline!
 
-*Note: You can view all release assets, pre-releases, and alternative packages on the [GitHub Releases Page](https://github.com/Straniksss/Flux-Tasks/releases/tag/installer-v1).*
-
 ---
 
 ## 🚀 Automated Releases & OTA
