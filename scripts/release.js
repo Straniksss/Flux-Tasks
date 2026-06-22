@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { execSync } = require('child_process');
+const { execFileSync, execSync } = require('child_process');
 const readline = require('readline');
 const https = require('https');
 
@@ -16,6 +16,86 @@ const RELEASE_DIR = path.join(PROJECT_DIR, 'release');
 
 function prompt(question) {
   return new Promise((resolve) => rl.question(question, resolve));
+}
+
+function runGit(args, options = {}) {
+  return execFileSync('git', args, {
+    cwd: PROJECT_DIR,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    ...options
+  }).trim();
+}
+
+function getGitErrorText(error) {
+  return [error?.stderr, error?.stdout, error?.message]
+    .filter(Boolean)
+    .join('\n')
+    .toLowerCase();
+}
+
+function getFriendlyGitError(error) {
+  const text = getGitErrorText(error);
+
+  if (text.includes('non-fast-forward') || text.includes('fetch first') || text.includes('rejected')) {
+    return 'Удалённая ветка содержит новые изменения. Локальная ветка не была опубликована.';
+  }
+  if (text.includes('conflict') || text.includes('could not apply')) {
+    return 'Не удалось автоматически объединить локальные и удалённые изменения. Разрешите конфликты Git и повторите публикацию.';
+  }
+  if (text.includes('authentication failed') || text.includes('could not read username') || text.includes('permission denied')) {
+    return 'Нет доступа к удалённому репозиторию. Проверьте авторизацию GitHub.';
+  }
+  if (text.includes('repository not found')) {
+    return 'Удалённый GitHub-репозиторий не найден или недоступен.';
+  }
+  if (text.includes('could not resolve host') || text.includes('failed to connect')) {
+    return 'Не удалось подключиться к GitHub. Проверьте интернет-соединение.';
+  }
+  if (text.includes('no such remote') || text.includes('not appear to be a git repository')) {
+    return 'Remote origin не настроен или недоступен.';
+  }
+
+  return 'Не удалось синхронизировать изменения с удалённым репозиторием.';
+}
+
+function syncAndPushBranch(branch) {
+  runGit(['remote', 'get-url', 'origin']);
+
+  let remoteBranchExists = true;
+  try {
+    runGit(['ls-remote', '--exit-code', '--heads', 'origin', `refs/heads/${branch}`]);
+  } catch (error) {
+    if (error?.status === 2) {
+      remoteBranchExists = false;
+    } else {
+      throw error;
+    }
+  }
+
+  if (remoteBranchExists) {
+    console.log(`Получаем актуальные изменения origin/${branch}...`);
+    runGit(['fetch', '--prune', 'origin', branch]);
+
+    const localHead = runGit(['rev-parse', 'HEAD']);
+    const remoteHead = runGit(['rev-parse', `origin/${branch}`]);
+    const mergeBase = runGit(['merge-base', 'HEAD', `origin/${branch}`]);
+
+    if (localHead !== remoteHead && mergeBase !== remoteHead) {
+      console.log(`Синхронизируем локальные коммиты поверх origin/${branch}...`);
+      try {
+        runGit(['rebase', `origin/${branch}`]);
+      } catch (error) {
+        try {
+          runGit(['rebase', '--abort']);
+        } catch (_) {}
+        throw new Error('GIT_REBASE_CONFLICT', { cause: error });
+      }
+    }
+  }
+
+  console.log(`Пушим изменения в удалённый репозиторий (ветка: ${branch})...`);
+  runGit(['push', '--set-upstream', 'origin', `HEAD:refs/heads/${branch}`]);
 }
 
 // Расчет контрольной суммы SHA256 файла
@@ -236,26 +316,29 @@ async function startRelease() {
     fs.writeFileSync(PACKAGE_JSON_PATH, JSON.stringify(packageJson, null, 2), 'utf8');
     console.log(`\nВерсия в package.json обновлена до: ${version}`);
 
-    // Коммитим и пушим изменения в репозиторий (package.json)
-    console.log('\nВыполнение Git коммита и пуша изменений...');
+    // Коммитим и синхронизируем изменения с удалённой веткой.
+    console.log('\nСохраняем и синхронизируем изменения Git...');
     try {
-      let currentBranch = 'main';
-      try {
-        currentBranch = execSync('git rev-parse --abbrev-ref HEAD', { cwd: PROJECT_DIR }).toString().trim();
-      } catch (e) {}
-
-      execSync('git add -A', { stdio: 'inherit', cwd: PROJECT_DIR });
-      try {
-        execSync(`git commit -m "chore(release): bump version to v${version}"`, { stdio: 'inherit', cwd: PROJECT_DIR });
-      } catch (commitErr) {
-        console.log('Изменений для коммита не найдено или коммит уже сделан.');
+      const currentBranch = runGit(['branch', '--show-current']);
+      if (!currentBranch) {
+        throw new Error('Текущая ветка Git не найдена.');
       }
-      
-      console.log(`Пушим изменения в удаленный репозиторий (ветка: ${currentBranch})...`);
-      execSync(`git push origin ${currentBranch}`, { stdio: 'inherit', cwd: PROJECT_DIR });
-      console.log('Изменения успешно отправлены на GitHub.');
+
+      runGit(['add', '-A']);
+      const stagedChanges = runGit(['diff', '--cached', '--name-only']);
+      if (stagedChanges) {
+        runGit(['commit', '-m', `chore(release): bump version to v${version}`]);
+      } else {
+        console.log('Новых изменений для коммита нет.');
+      }
+
+      syncAndPushBranch(currentBranch);
+      console.log('Изменения успешно синхронизированы и отправлены на GitHub.');
     } catch (gitErr) {
-      console.error('[Предупреждение] Не удалось выполнить git commit/push:', gitErr.message);
+      const friendlyMessage = gitErr?.message === 'GIT_REBASE_CONFLICT'
+        ? 'Не удалось автоматически объединить локальные и удалённые изменения. Rebase отменён; локальные коммиты сохранены.'
+        : getFriendlyGitError(gitErr);
+      throw new Error(friendlyMessage);
     }
 
     // 2. Скомпилировать и упаковать цели приложения (EXE и ZIP)
