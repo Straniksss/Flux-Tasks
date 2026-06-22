@@ -36,6 +36,10 @@ export const SettingsView: React.FC = () => {
   const [rollbackInfo, setRollbackInfo] = useState<{ occurred: boolean; error?: string } | null>(null);
 
   useEffect(() => {
+    setAccentInput(settings.accentColor);
+  }, [settings.accentColor]);
+
+  useEffect(() => {
     const fetchVersionAndRollback = async () => {
       if (window.api) {
         try {
@@ -182,9 +186,13 @@ export const SettingsView: React.FC = () => {
 
   const handleApplyCustomAccent = (hex: string) => {
     setAccentInput(hex);
-    updateSettings('accentColor', hex);
+    if (!/^#[0-9a-f]{6}$/i.test(hex)) return;
+
+    const normalizedHex = hex.toLowerCase();
+    updateSettings('accentColor', normalizedHex);
     // Auto set start-end of gradients matching selected accent for solid look
-    updateSettings('gradientStart', hex);
+    updateSettings('gradientStart', normalizedHex);
+    updateSettings('gradientEnd', normalizedHex);
   };
 
   const handleSwatchClick = (preset: typeof swatchColors[0]) => {
@@ -246,7 +254,7 @@ export const SettingsView: React.FC = () => {
       {/* Settings Title */}
       <div>
         <h2 className="text-xl font-display font-semibold text-white tracking-tight flex items-center gap-2">
-          <Icons.Settings className="w-5 h-5 text-emerald-400 animate-spin" style={{ animationDuration: '6s' }} />
+          <Icons.Settings className="w-5 h-5 accent-text animate-spin" style={{ animationDuration: '6s' }} />
           <span>{getTranslation(lang, 'settingsTitle')}</span>
         </h2>
         <p className="text-xs text-slate-400">{getTranslation(lang, 'controlDesignSystemDesc')}</p>
@@ -266,7 +274,7 @@ export const SettingsView: React.FC = () => {
           {/* 1. DESKTOP BACKGROUND STYLE */}
           <div className="space-y-3.5">
             <h4 className="text-xs font-semibold tracking-wider text-slate-400 uppercase flex items-center gap-2">
-              <Icons.Wallpaper className="w-4 h-4 text-emerald-400" />
+              <Icons.Wallpaper className="w-4 h-4 accent-text" />
               <span>{getTranslation(lang, 'bgStyleLabel')}</span>
             </h4>
 
@@ -280,11 +288,11 @@ export const SettingsView: React.FC = () => {
                     onClick={() => updateSettings('bgStyle', style)}
                     className={`cursor-pointer p-3.5 rounded-xl border text-center flex flex-col items-center gap-2 transition-all bg-slate-900/30 ${
                       isSel 
-                        ? 'border-emerald-400/50 bg-slate-900/60 shadow-md scale-[1.01]' 
+                        ? 'accent-border-50 bg-slate-900/60 shadow-md scale-[1.01]'
                         : 'border-white/5 hover:border-white/10'
                     }`}
                   >
-                    <div className={`p-1 rounded ${isSel ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500'}`}>
+                    <div className={`p-1 rounded ${isSel ? 'accent-text accent-bg-10' : 'text-slate-500'}`}>
                       <IconComponent className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-semibold text-white">{getTranslation(lang, labelKey)}</span>
@@ -297,7 +305,7 @@ export const SettingsView: React.FC = () => {
           {/* 2. ACCENT Presets & Sliding Custom Gradients */}
           <div className="space-y-4">
             <h4 className="text-xs font-semibold tracking-wider text-slate-400 uppercase flex items-center gap-2">
-              <Icons.SlidersHorizontal className="w-4 h-4 text-emerald-400" />
+              <Icons.SlidersHorizontal className="w-4 h-4 accent-text" />
               <span>{getTranslation(lang, 'accentColorLabel')}</span>
             </h4>
 
@@ -311,7 +319,7 @@ export const SettingsView: React.FC = () => {
                     onClick={() => handleSwatchClick(clrPreset)}
                     className={`p-3 rounded-xl border cursor-pointer select-none transition-all flex items-center gap-2.5 bg-slate-900/30 font-medium ${
                       isSel 
-                        ? 'border-emerald-400/45 bg-slate-900/50 shadow' 
+                        ? 'accent-border-50 bg-slate-900/50 shadow'
                         : 'border-white/5 hover:border-white/10 hover:bg-slate-900/40'
                     }`}
                   >
@@ -331,7 +339,7 @@ export const SettingsView: React.FC = () => {
                 <label className="text-[10px] text-slate-400 font-mono">{getTranslation(lang, 'customColorHex')}</label>
                 <input
                   type="color"
-                  value={accentInput}
+                  value={/^#[0-9a-f]{6}$/i.test(accentInput) ? accentInput : settings.accentColor}
                   onChange={(e) => handleApplyCustomAccent(e.target.value)}
                   className="w-7 h-7 rounded border-none bg-transparent cursor-pointer shrink-0"
                   title="Accent color picker"
@@ -340,6 +348,12 @@ export const SettingsView: React.FC = () => {
                   type="text"
                   value={accentInput}
                   onChange={(e) => handleApplyCustomAccent(e.target.value)}
+                  onBlur={() => {
+                    if (!/^#[0-9a-f]{6}$/i.test(accentInput)) {
+                      setAccentInput(settings.accentColor);
+                    }
+                  }}
+                  maxLength={7}
                   className="py-1 px-2 border border-white/10 bg-black/45 rounded font-mono text-[10px] text-white w-20 uppercase"
                 />
               </div>
@@ -352,7 +366,7 @@ export const SettingsView: React.FC = () => {
           {/* 3. GLASS MATERIAL PRESETS */}
           <div className="space-y-3.5">
             <h4 className="text-xs font-semibold tracking-wider text-slate-400 uppercase flex items-center gap-2">
-              <Icons.GlassWater className="w-4 h-4 text-emerald-400" />
+              <Icons.GlassWater className="w-4 h-4 accent-text" />
               <span>{getTranslation(lang, 'glassPresetLabel')}</span>
             </h4>
 
@@ -365,7 +379,7 @@ export const SettingsView: React.FC = () => {
                     onClick={() => updateSettings('glassPreset', preset)}
                     className={`cursor-pointer p-3.5 rounded-xl border text-left flex flex-col justify-between transition-all bg-slate-900/30 ${
                       isSel 
-                        ? 'border-emerald-400/50 bg-slate-900/70 shadow-[0_4px_16px_rgba(16,185,129,0.1)] scale-[1.02]' 
+                        ? 'accent-border-50 bg-slate-900/70 accent-glow-sm scale-[1.02]'
                         : 'border-white/5 hover:border-white/10'
                     }`}
                   >
@@ -380,7 +394,7 @@ export const SettingsView: React.FC = () => {
           {/* 4. FINE-TUNED APPEARANCE METRICS */}
           <div className="pt-5 border-t border-white/[0.04] space-y-4">
             <h4 className="text-xs font-semibold tracking-wider text-slate-400 uppercase flex items-center gap-2">
-              <Icons.Sliders className="w-4 h-4 text-emerald-400" />
+              <Icons.Sliders className="w-4 h-4 accent-text" />
               <span>{lang === 'ru' ? 'Тонкая настройка интерфейса' : lang === 'uk' ? 'Тонке налаштування інтерфейсу' : 'Fine-Tuned Metrics'}</span>
             </h4>
 
@@ -391,7 +405,7 @@ export const SettingsView: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-[11px] font-medium text-slate-300 flex justify-between">
                     <span>{lang === 'ru' ? 'Масштаб интервалов (Spacing)' : lang === 'uk' ? 'Масштаб інтервалів (Spacing)' : 'Layout Spacing Scale'}</span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase">{settings.spacingScale === 'compact' ? (lang === 'ru' ? 'Компактный' : lang === 'uk' ? 'Компактний' : 'Compact') : (lang === 'ru' ? 'Комфортный' : lang === 'uk' ? 'Комфортний' : 'Comfortable')}</span>
+                    <span className="text-[10px] font-mono accent-text font-bold uppercase">{settings.spacingScale === 'compact' ? (lang === 'ru' ? 'Компактный' : lang === 'uk' ? 'Компактний' : 'Compact') : (lang === 'ru' ? 'Комфортный' : lang === 'uk' ? 'Комфортний' : 'Comfortable')}</span>
                   </label>
                   <div className="flex bg-slate-900/40 rounded-xl p-1 border border-white/5 select-none w-fit">
                     <button
@@ -413,7 +427,7 @@ export const SettingsView: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-[11px] font-medium text-slate-300 flex justify-between">
                     <span>{lang === 'ru' ? 'Анимации интерфейса' : lang === 'uk' ? 'Анімації інтерфейсу' : 'UI Animations'}</span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase">{settings.animationsEnabled === 'false' ? (lang === 'ru' ? 'Выкл' : 'Off') : (lang === 'ru' ? 'Вкл' : 'On')}</span>
+                    <span className="text-[10px] font-mono accent-text font-bold uppercase">{settings.animationsEnabled === 'false' ? (lang === 'ru' ? 'Выкл' : 'Off') : (lang === 'ru' ? 'Вкл' : 'On')}</span>
                   </label>
                   <div className="flex bg-slate-900/40 rounded-xl p-1 border border-white/5 select-none w-fit">
                     <button
@@ -438,7 +452,7 @@ export const SettingsView: React.FC = () => {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-[11px] font-medium text-slate-300">
                     <span>{lang === 'ru' ? 'Масштаб шрифта' : lang === 'uk' ? 'Масштаб шрифту' : 'Font Size Scale'}</span>
-                    <span className="font-mono text-emerald-400 font-bold">{settings.fontScale || '1.0'}x</span>
+                    <span className="font-mono accent-text font-bold">{settings.fontScale || '1.0'}x</span>
                   </div>
                   <input
                     type="range"
@@ -447,7 +461,8 @@ export const SettingsView: React.FC = () => {
                     step="0.05"
                     value={settings.fontScale || '1.0'}
                     onChange={(e) => updateSettings('fontScale', e.target.value)}
-                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                    style={{ accentColor: 'var(--accent)' }}
                   />
                 </div>
 
@@ -455,7 +470,7 @@ export const SettingsView: React.FC = () => {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-[11px] font-medium text-slate-300">
                     <span>{lang === 'ru' ? 'Скругление карточек (Radius)' : lang === 'uk' ? 'Скруглення карток (Radius)' : 'Card Border Radius'}</span>
-                    <span className="font-mono text-emerald-400 font-bold">{settings.cardRadius || '18'}px</span>
+                    <span className="font-mono accent-text font-bold">{settings.cardRadius || '18'}px</span>
                   </div>
                   <input
                     type="range"
@@ -464,7 +479,8 @@ export const SettingsView: React.FC = () => {
                     step="1"
                     value={settings.cardRadius || '18'}
                     onChange={(e) => updateSettings('cardRadius', e.target.value)}
-                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                    style={{ accentColor: 'var(--accent)' }}
                   />
                 </div>
               </div>
@@ -475,7 +491,7 @@ export const SettingsView: React.FC = () => {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-[11px] font-medium text-slate-300">
                   <span>{lang === 'ru' ? 'Интенсивность стекла (Opacity)' : lang === 'uk' ? 'Інтенсивність скла (Opacity)' : 'Glass Opacity'}</span>
-                  <span className="font-mono text-emerald-400 font-bold">{Math.round((parseFloat(settings.glassOpacity || '0.015')) * 100)}%</span>
+                  <span className="font-mono accent-text font-bold">{Math.round((parseFloat(settings.glassOpacity || '0.015')) * 100)}%</span>
                 </div>
                 <input
                   type="range"
@@ -484,7 +500,8 @@ export const SettingsView: React.FC = () => {
                   step="0.005"
                   value={settings.glassOpacity || '0.015'}
                   onChange={(e) => updateSettings('glassOpacity', e.target.value)}
-                  className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                  className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                  style={{ accentColor: 'var(--accent)' }}
                 />
               </div>
 
@@ -492,7 +509,7 @@ export const SettingsView: React.FC = () => {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-[11px] font-medium text-slate-300">
                   <span>{lang === 'ru' ? 'Радиус размытия (Blur)' : lang === 'uk' ? 'Радіус розмиття (Blur)' : 'Glass Blur Radius'}</span>
-                  <span className="font-mono text-emerald-400 font-bold">{settings.glassBlur || '36'}px</span>
+                  <span className="font-mono accent-text font-bold">{settings.glassBlur || '36'}px</span>
                 </div>
                 <input
                   type="range"
@@ -501,7 +518,8 @@ export const SettingsView: React.FC = () => {
                   step="2"
                   value={settings.glassBlur || '36'}
                   onChange={(e) => updateSettings('glassBlur', e.target.value)}
-                  className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                  className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                  style={{ accentColor: 'var(--accent)' }}
                 />
               </div>
 
@@ -509,7 +527,7 @@ export const SettingsView: React.FC = () => {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-[11px] font-medium text-slate-300">
                   <span>{lang === 'ru' ? 'Прозрачность боковой панели' : lang === 'uk' ? 'Прозорість бічної панелі' : 'Sidebar Opacity'}</span>
-                  <span className="font-mono text-emerald-400 font-bold">{Math.round((parseFloat(settings.sidebarOpacity || '0.03')) * 100)}%</span>
+                  <span className="font-mono accent-text font-bold">{Math.round((parseFloat(settings.sidebarOpacity || '0.03')) * 100)}%</span>
                 </div>
                 <input
                   type="range"
@@ -518,7 +536,8 @@ export const SettingsView: React.FC = () => {
                   step="0.005"
                   value={settings.sidebarOpacity || '0.03'}
                   onChange={(e) => updateSettings('sidebarOpacity', e.target.value)}
-                  className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                  className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                  style={{ accentColor: 'var(--accent)' }}
                 />
               </div>
             </div>
@@ -586,8 +605,8 @@ export const SettingsView: React.FC = () => {
               <div className="space-y-2.5 font-sans pt-1">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">{lang === 'ru' ? 'Статус:' : 'Status:'}</span>
-                  <span className="font-mono font-bold text-emerald-400 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                  <span className="font-mono font-bold accent-text flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full accent-bg animate-ping inline-block" />
                     Live
                   </span>
                 </div>
@@ -632,7 +651,7 @@ export const SettingsView: React.FC = () => {
           <div className="glass-card p-5 flex flex-col justify-between border border-white/5 bg-slate-900/10 hover:border-white/10 transition-all">
             <div className="space-y-4">
               <h4 className="text-xs font-semibold text-slate-200 flex items-center gap-1.5 uppercase tracking-wider">
-                <Icons.DownloadCloud className="w-3.5 h-3.5 text-emerald-400" />
+                <Icons.DownloadCloud className="w-3.5 h-3.5 accent-text" />
                 <span>{lang === 'ru' ? 'Резервные копии' : lang === 'uk' ? 'Резервні копії' : 'Backups & Settings'}</span>
               </h4>
               
@@ -645,7 +664,7 @@ export const SettingsView: React.FC = () => {
                     onClick={() => updateSettings('autoBackupEnabled', settings.autoBackupEnabled === 'false' ? 'true' : 'false')}
                     className={`py-1 px-3.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer border ${
                       settings.autoBackupEnabled !== 'false'
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'
+                        ? 'accent-bg-10 accent-text accent-border-25'
                         : 'bg-slate-900/50 text-slate-500 border-white/5'
                     }`}
                   >
@@ -692,7 +711,7 @@ export const SettingsView: React.FC = () => {
                 {/* Create Manual Backup */}
                 <button
                   onClick={() => triggerBackup('manual')}
-                  className="py-1.5 px-3 rounded-xl bg-emerald-500/90 hover:bg-emerald-500 text-slate-950 text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                  className="py-1.5 px-3 rounded-xl btn-accent text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-colors"
                 >
                   <Icons.Plus className="w-3.5 h-3.5" />
                   <span>{lang === 'ru' ? 'Создать копию сейчас' : lang === 'uk' ? 'Створити копію зараз' : 'Create Copy Now'}</span>
@@ -787,7 +806,7 @@ export const SettingsView: React.FC = () => {
                       <span className={`text-[8px] font-mono px-1 py-0.2 rounded border font-semibold ${
                         bak.type === 'auto' 
                           ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/25' 
-                          : 'bg-emerald-500/10 text-emerald-400/90 border-emerald-500/25'
+                          : 'accent-bg-10 accent-text accent-border-25'
                       }`}>
                         {bak.type === 'auto' ? 'AUTO' : 'MANUAL'}
                       </span>
@@ -814,7 +833,7 @@ export const SettingsView: React.FC = () => {
                               showToast(`Error: ${res.error}`, 'error');
                             }
                           }}
-                          className="text-[10px] text-emerald-400 hover:text-emerald-300 hover:underline cursor-pointer flex items-center gap-0.5"
+                          className="text-[10px] accent-text accent-hover-text hover:underline cursor-pointer flex items-center gap-0.5"
                         >
                           <Icons.RotateCcw className="w-2.5 h-2.5" />
                           <span>{lang === 'ru' ? 'Восст.' : 'Restore'}</span>
@@ -886,7 +905,7 @@ export const SettingsView: React.FC = () => {
                 <select
                   value={settings.updateChannel || 'stable'}
                   onChange={(e) => updateSettings('updateChannel', e.target.value)}
-                  className="w-full py-1.5 px-3 rounded-xl border border-white/5 bg-slate-900/40 text-xs text-white focus:outline-none focus:border-emerald-400"
+                  className="w-full py-1.5 px-3 rounded-xl border border-white/5 bg-slate-900/40 text-xs text-white focus:outline-none accent-focus"
                 >
                   <option value="stable">Stable (Рекомендуется)</option>
                   <option value="beta">Beta (Тестирование)</option>
@@ -905,7 +924,7 @@ export const SettingsView: React.FC = () => {
                   <button
                     onClick={handleCheckForUpdates}
                     disabled={updateStatus === 'checking' || updateStatus === 'downloading'}
-                    className="py-1.5 px-3 rounded-lg bg-emerald-505 bg-emerald-500 text-slate-950 font-bold flex items-center gap-1 cursor-pointer transition-colors text-[11px] disabled:opacity-50"
+                    className="py-1.5 px-3 rounded-lg btn-accent font-bold flex items-center gap-1 cursor-pointer transition-colors text-[11px] disabled:opacity-50"
                   >
                     <Icons.RefreshCw className={`w-3.5 h-3.5 ${updateStatus === 'checking' ? 'animate-spin' : ''}`} />
                     <span>{lang === 'ru' ? 'Проверить обновления' : lang === 'uk' ? 'Перевірити оновлення' : 'Check for Updates'}</span>
@@ -927,7 +946,7 @@ export const SettingsView: React.FC = () => {
                   <span className="text-slate-400 animate-pulse">{lang === 'ru' ? 'Поиск обновлений...' : lang === 'uk' ? 'Пошук оновлень...' : 'Checking for updates...'}</span>
                 )}
                 {updateStatus === 'no-update' && (
-                  <span className="text-emerald-400 font-semibold">{lang === 'ru' ? 'У вас установлена последняя версия.' : lang === 'uk' ? 'У вас встановлена остання версія.' : 'You are running the latest version.'}</span>
+                  <span className="accent-text font-semibold">{lang === 'ru' ? 'У вас установлена последняя версия.' : lang === 'uk' ? 'У вас встановлена остання версія.' : 'You are running the latest version.'}</span>
                 )}
                 {updateStatus === 'error' && (
                   <div className="space-y-2">
@@ -976,7 +995,7 @@ export const SettingsView: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-slate-500">{lang === 'ru' ? 'Новая:' : lang === 'uk' ? 'Нова:' : 'Latest:'}</span>
-                  <span className="font-mono font-bold text-emerald-400 ml-1.5">v{discoveredManifest.version}</span>
+                  <span className="font-mono font-bold accent-text ml-1.5">v{discoveredManifest.version}</span>
                 </div>
                 <div>
                   <span className="text-slate-500">{lang === 'ru' ? 'Размер:' : lang === 'uk' ? 'Розмір:' : 'Download Size:'}</span>
@@ -1005,20 +1024,20 @@ export const SettingsView: React.FC = () => {
           {updateStatus === 'downloading' && (
             <div className="p-3 rounded-xl border border-white/5 bg-slate-900/40 flex items-center justify-between gap-4">
               <span className="text-[11px] text-slate-400 animate-pulse">{lang === 'ru' ? 'Загрузка пакета обновления...' : lang === 'uk' ? 'Завантаження пакета оновлення...' : 'Downloading update package...'}</span>
-              <Icons.Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+              <Icons.Loader2 className="w-4 h-4 accent-text animate-spin" />
             </div>
           )}
 
           {/* Download complete, ready to install */}
           {updateStatus === 'downloaded' && (
-            <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between gap-4 animate-fade-in">
+            <div className="p-4 rounded-xl border accent-border-20 accent-bg-5 flex items-center justify-between gap-4 animate-fade-in">
               <div>
                 <div className="text-xs font-bold text-white">{lang === 'ru' ? 'Обновление загружено!' : lang === 'uk' ? 'Оновлення завантажено!' : 'Update Downloaded!'}</div>
                 <div className="text-[10px] text-slate-400 mt-0.5">{lang === 'ru' ? 'Нажмите кнопку для установки и перезапуска приложения.' : lang === 'uk' ? 'Натисніть кнопку для встановлення та перезапуску програми.' : 'Click install to apply patch and restart the application.'}</div>
               </div>
               <button
                 onClick={handleInstallUpdate}
-                className="py-1.5 px-4 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs cursor-pointer active:scale-95 transition-all"
+                className="py-1.5 px-4 rounded-lg btn-accent font-bold text-xs cursor-pointer active:scale-95 transition-all"
               >
                 {lang === 'ru' ? 'Установить и перезапустить' : lang === 'uk' ? 'Встановити та перезапустити' : 'Install & Restart'}
               </button>

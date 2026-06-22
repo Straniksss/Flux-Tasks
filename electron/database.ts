@@ -408,8 +408,22 @@ export function saveTask(t: Task) {
   runInTransaction(() => {
     // 1. Save core task
     runQuery(
-      `INSERT OR REPLACE INTO tasks (id, title, description, projectId, priority, type, status, notes, codeSnippets, createdDate, updatedDate, githubIssueNumber, githubIssueUrl, githubIssueState)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO tasks (id, title, description, projectId, priority, type, status, notes, codeSnippets, createdDate, updatedDate, githubIssueNumber, githubIssueUrl, githubIssueState)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         title = excluded.title,
+         description = excluded.description,
+         projectId = excluded.projectId,
+         priority = excluded.priority,
+         type = excluded.type,
+         status = excluded.status,
+         notes = excluded.notes,
+         codeSnippets = excluded.codeSnippets,
+         createdDate = excluded.createdDate,
+         updatedDate = excluded.updatedDate,
+         githubIssueNumber = excluded.githubIssueNumber,
+         githubIssueUrl = excluded.githubIssueUrl,
+         githubIssueState = excluded.githubIssueState`,
       [
         t.id,
         t.title,

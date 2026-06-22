@@ -77,6 +77,7 @@ contextBridge.exposeInMainWorld('api', {
     createIssue: (owner: string, repo: string, issue: any) => ipcRenderer.invoke('github:createIssue', owner, repo, issue),
     updateIssueStatus: (owner: string, repo: string, number: number, state: 'open' | 'closed') => ipcRenderer.invoke('github:updateIssueStatus', owner, repo, number, state),
     getReleases: (owner: string, repo: string) => ipcRenderer.invoke('github:getReleases', owner, repo),
+    validateRepositoryAccess: (owner: string, repo: string) => ipcRenderer.invoke('github:validateRepositoryAccess', owner, repo),
     createRelease: (owner: string, repo: string, releaseData: any) => ipcRenderer.invoke('github:createRelease', owner, repo, releaseData),
     uploadReleaseAsset: (owner: string, repo: string, releaseId: number, filePath: string, name: string) => ipcRenderer.invoke('github:uploadReleaseAsset', owner, repo, releaseId, filePath, name)
   },
@@ -84,6 +85,9 @@ contextBridge.exposeInMainWorld('api', {
   // Git Local API
   git: {
     getStatus: (localPath: string) => ipcRenderer.invoke('git:getStatus', localPath),
+    getCommits: (localPath: string, limit?: number) => ipcRenderer.invoke('git:getCommits', localPath, limit),
+    getTags: (localPath: string) => ipcRenderer.invoke('git:getTags', localPath),
+    validateRelease: (localPath: string, tagName: string) => ipcRenderer.invoke('git:validateRelease', localPath, tagName),
     pull: (localPath: string) => ipcRenderer.invoke('git:pull', localPath),
     push: (localPath: string) => ipcRenderer.invoke('git:push', localPath),
     commit: (localPath: string, message: string) => ipcRenderer.invoke('git:commit', localPath, message),

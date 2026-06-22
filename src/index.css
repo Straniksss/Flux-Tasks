@@ -98,6 +98,30 @@ html {
   font-size: calc(14px * var(--font-scale)) !important;
 }
 
+/*
+ * Keep generic Tailwind transitions on compositor-friendly properties.
+ * Animating layout properties through `all` causes full-page style/layout work.
+ */
+.transition-all {
+  transition-property: color, background-color, border-color, opacity, box-shadow, transform !important;
+}
+
+.motion-composite,
+.animate-fade-in,
+.animate-scale-up,
+.animate-slide-fade-down,
+.animate-slide-fade-up {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Skip layout and paint work for list rows outside the scroll viewport. */
+.performance-list > * {
+  content-visibility: auto;
+  contain: layout paint style;
+  contain-intrinsic-size: auto 150px;
+}
+
 /* Glowing background animations */
 @keyframes pulseGlow {
   0%, 100% {
@@ -116,10 +140,12 @@ html {
 
 .animate-glow-slow-1 {
   animation: pulseGlow 16s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .animate-glow-slow-2 {
   animation: pulseGlow 22s ease-in-out infinite alternate;
+  will-change: transform, opacity;
 }
 
 /* Premium Liquid Glass Styles */
@@ -131,10 +157,12 @@ html {
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.03),
     0 16px 40px rgba(0, 0, 0, 0.3);
+  transform: translateZ(0);
 }
 
 .glass-panel-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-panel-hover:hover {
   background: rgba(10, 18, 41, calc(var(--glass-opacity) * 1.5));
@@ -154,7 +182,9 @@ html {
   box-shadow: 
     inset 0 1px 0 rgba(255, 255, 255, 0.02),
     0 12px 30px -10px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateZ(0);
 }
 
 .glass-card-hover:hover {
@@ -172,7 +202,8 @@ html {
   border: 1px solid rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
   border-radius: 12px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-input:focus {
   outline: none;
@@ -187,14 +218,15 @@ html {
   color: #fff;
   border-radius: 10px;
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 15px rgba(91, 92, 255, 0.15);
+  transition: opacity 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 25%, transparent);
   cursor: pointer;
 }
 .btn-primary:hover:not(:disabled) {
   opacity: 0.95;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(91, 92, 255, 0.25);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
@@ -210,7 +242,8 @@ html {
   color: var(--text-primary);
   border-radius: 10px;
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 .btn-secondary:hover:not(:disabled) {
@@ -232,7 +265,8 @@ html {
   color: #ff6b8a;
   border-radius: 10px;
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 .btn-danger:hover:not(:disabled) {
@@ -248,7 +282,8 @@ html {
   background: transparent;
   color: var(--text-secondary);
   border-radius: 10px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 .btn-ghost:hover:not(:disabled) {
@@ -256,7 +291,87 @@ html {
   color: var(--text-primary);
 }
 
-/* Accent texts */
+/* ═══════════════════════════════════════════════════════════════
+   Dynamic Accent Color Utility Classes
+   These classes use the --accent CSS variable so they respond
+   to the user's chosen accent color in real-time.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Text */
+.accent-text { color: var(--accent); }
+.accent-text-muted { color: color-mix(in srgb, var(--accent) 70%, transparent); }
+
+/* Backgrounds */
+.accent-bg { background-color: var(--accent); }
+.accent-bg-5 { background-color: color-mix(in srgb, var(--accent) 5%, transparent); }
+.accent-bg-10 { background-color: color-mix(in srgb, var(--accent) 10%, transparent); }
+.accent-bg-15 { background-color: color-mix(in srgb, var(--accent) 15%, transparent); }
+.accent-bg-20 { background-color: color-mix(in srgb, var(--accent) 20%, transparent); }
+.accent-bg-30 { background-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.accent-bg-90 { background-color: color-mix(in srgb, var(--accent) 90%, transparent); }
+.accent-bg-gradient { background: var(--accent-gradient); }
+
+/* Borders */
+.accent-border { border-color: var(--accent); }
+.accent-border-10 { border-color: color-mix(in srgb, var(--accent) 10%, transparent); }
+.accent-border-20 { border-color: color-mix(in srgb, var(--accent) 20%, transparent); }
+.accent-border-25 { border-color: color-mix(in srgb, var(--accent) 25%, transparent); }
+.accent-border-30 { border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.accent-border-40 { border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+.accent-border-50 { border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+
+/* Box shadows / glows */
+.accent-glow { box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 65%, transparent); }
+.accent-glow-sm { box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 15%, transparent); }
+.accent-glow-md { box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent); }
+.accent-glow-lg { box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 15%, transparent), 0 0 80px color-mix(in srgb, var(--accent) 8%, transparent); }
+
+/* Focus ring */
+.accent-focus:focus { border-color: var(--accent) !important; }
+.accent-focus-50:focus { border-color: color-mix(in srgb, var(--accent) 50%, transparent) !important; }
+
+/* Hover states */
+.accent-hover-bg:hover { background-color: color-mix(in srgb, var(--accent) 10%, transparent); }
+.accent-hover-bg-20:hover { background-color: color-mix(in srgb, var(--accent) 20%, transparent); }
+.accent-hover-bg-30:hover { background-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.accent-hover-text:hover { color: var(--accent); }
+
+/* Combined accent button (primary) */
+.btn-accent {
+  background: var(--accent);
+  color: #0a0f1e;
+  font-weight: 700;
+  border-radius: 10px;
+  transition: opacity 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.btn-accent:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.btn-accent:active:not(:disabled) { transform: translateY(0); }
+.btn-accent:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Accent soft button (outline/ghost accent) */
+.btn-accent-soft {
+  background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+  border-radius: 10px;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.btn-accent-soft:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Accent gradient text */
 .text-gradient {
   background: var(--accent-gradient);
   -webkit-background-clip: text;
@@ -319,6 +434,17 @@ html {
 
 .animate-slide-fade-up {
   animation: slideFadeUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Disable all transitions and animations class */

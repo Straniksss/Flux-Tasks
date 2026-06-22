@@ -241,7 +241,7 @@ export const Sidebar: React.FC = () => {
             title={getTranslation(lang, 'dashboard')}
           >
             <div className="flex items-center gap-2 truncate">
-              <Icons.LayoutDashboard className="w-4 h-4 shrink-0 text-[#3bd2ff]" />
+              <Icons.LayoutDashboard className="w-4 h-4 shrink-0 accent-text" />
               {!isCollapsed && <span className="truncate">{getTranslation(lang, 'dashboard')}</span>}
             </div>
           </button>
@@ -274,7 +274,7 @@ export const Sidebar: React.FC = () => {
             title={lang === 'ru' ? 'Промпты' : lang === 'uk' ? 'Промпти' : 'Prompts'}
           >
             <div className="flex items-center gap-2 truncate">
-              <Icons.Cpu className="w-4 h-4 shrink-0 text-indigo-400" />
+              <Icons.Cpu className="w-4 h-4 shrink-0 accent-text" />
               {!isCollapsed && <span className="truncate">{lang === 'ru' ? 'Промпты' : lang === 'uk' ? 'Промпти' : 'Prompts'}</span>}
             </div>
           </button>
@@ -290,7 +290,7 @@ export const Sidebar: React.FC = () => {
             title={getTranslation(lang, 'notes')}
           >
             <div className="flex items-center gap-2 truncate">
-              <Icons.StickyNote className="w-4 h-4 shrink-0 text-[#ff52df]" />
+              <Icons.StickyNote className="w-4 h-4 shrink-0 accent-text" />
               {!isCollapsed && <span className="truncate">{getTranslation(lang, 'notes')}</span>}
             </div>
           </button>
@@ -370,7 +370,7 @@ export const Sidebar: React.FC = () => {
                   <span>{getTranslation(lang, 'projects')}</span>
                 </div>
                 <Icons.Plus 
-                  className="w-3.5 h-3.5 hover:text-emerald-400 transition-colors cursor-pointer"
+                  className="w-3.5 h-3.5 accent-hover-text transition-colors cursor-pointer"
                   onClick={(e) => { e.stopPropagation(); setIsNewProjectOpen(true); }}
                 />
               </button>
@@ -602,7 +602,7 @@ export const Sidebar: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:opacity-90 active:scale-95 transition-all shadow-[0_4px_12px_rgba(16,185,129,0.25)] cursor-pointer"
+                  className="px-6 py-2 text-xs font-bold rounded-xl accent-bg-gradient text-slate-950 hover:opacity-90 active:scale-95 transition-all accent-glow-sm cursor-pointer"
                 >
                   OK
                 </button>
@@ -778,7 +778,7 @@ export const Sidebar: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:opacity-90 active:scale-95 transition-all shadow-[0_4px_12px_rgba(16,185,129,0.25)] cursor-pointer"
+                  className="px-6 py-2 text-xs font-bold rounded-xl accent-bg-gradient text-slate-950 hover:opacity-90 active:scale-95 transition-all accent-glow-sm cursor-pointer"
                 >
                   {lang === 'ru' ? 'Сохранить' : lang === 'uk' ? 'Зберегти' : 'Save'}
                 </button>

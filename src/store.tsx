@@ -341,6 +341,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const updateTask = async (updatedTask: Task, changeMessage?: string) => {
     const nowStr = new Date().toISOString();
     const logId = `h-${Date.now()}-changed`;
+    const previousTask = tasks.find(task => task.id === updatedTask.id);
     const newLogItem = { id: logId, timestamp: nowStr, action: 'edited', details: changeMessage || 'Task details modified' };
     const taskWithUpdate = {
       ...updatedTask,
@@ -366,9 +367,26 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setActivityLogs(prev => [newLog, ...prev].slice(0, 200));
 
     if (window.api) {
-      window.api.saveTask(taskWithUpdate).catch(err => {
+      try {
+        await window.api.saveTask(taskWithUpdate);
+      } catch (err) {
         console.error('Failed to save updated task in DB asynchronously', err);
-      });
+        if (previousTask) {
+          setTasks(prev => prev.map(task => task.id === previousTask.id ? previousTask : task));
+          if (selectedTask?.id === previousTask.id) {
+            setSelectedTask(previousTask);
+          }
+        }
+        setActivityLogs(prev => prev.filter(log => log.id !== logId));
+        showToast(
+          settings.language === 'ru'
+            ? 'Не удалось сохранить изменения задачи'
+            : settings.language === 'uk'
+              ? 'Не вдалося зберегти зміни задачі'
+              : 'Failed to save task changes',
+          'error'
+        );
+      }
     }
   };
 
@@ -590,18 +608,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const updateSettings = async (key: keyof (DesignSystem & { language: AppLanguage; onboardingCompleted: string; updateChannel: string; taskViewMode?: 'list' | 'kanban'; projectViewMode?: 'list' | 'kanban'; enableGitIntegration?: string; gitPath?: string; gitUsername?: string; gitEmail?: string }), value: any) => {
-    const updated = {
-      ...settings,
+    setSettings((current: any) => ({
+      ...current,
       [key]: value
-    };
-    setSettings(updated);
+    }));
 
     if (window.api) {
-      const mappedRaw: Record<string, string> = {};
-      Object.entries(updated).forEach(([k, v]) => {
-        mappedRaw[k] = String(v);
-      });
-      await window.api.saveSettings(mappedRaw);
+      await window.api.saveSettings({ [key]: String(value) });
     }
   };
 

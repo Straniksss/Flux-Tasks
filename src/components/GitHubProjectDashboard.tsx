@@ -13,6 +13,10 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'issues' | 'git'>('dashboard');
   const [gitStatus, setGitStatus] = useState<any>(null);
+  const [commits, setCommits] = useState<Array<{ hash: string; shortHash: string; author: string; date: string; message: string }>>([]);
+  const [localTags, setLocalTags] = useState<Array<{ name: string; date: string; message: string }>>([]);
+  const [githubReleases, setGithubReleases] = useState<any[]>([]);
+  const [gitError, setGitError] = useState<string | null>(null);
   const [repoData, setRepoData] = useState<any>(null);
   const [issues, setIssues] = useState<any[]>([]);
   
@@ -23,6 +27,7 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
   const [isGitHubConnected, setIsGitHubConnected] = useState(false);
   const [isGitHubOnline, setIsGitHubOnline] = useState(false);
   const [gitActionLoading, setGitActionLoading] = useState<string | null>(null);
+  const [isCommitModalOpen, setIsCommitModalOpen] = useState(false);
 
   // Commit and Tag input states
   const [commitMessage, setCommitMessage] = useState('');
@@ -250,16 +255,28 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
   const loadGitStatus = async () => {
     if (!project?.localPath || !window.api) return;
     setIsLoadingGit(true);
+    setGitError(null);
     try {
-      const res = await window.api.git.getStatus(project.localPath);
-      if (res.success && res.status) {
-        setGitStatus(res.status);
+      const [statusRes, commitsRes, tagsRes, releasesRes] = await Promise.all([
+        window.api.git.getStatus(project.localPath),
+        window.api.git.getCommits(project.localPath, 30),
+        window.api.git.getTags(project.localPath),
+        project.githubOwner && project.githubRepo && isGitHubConnected && isGitHubOnline
+          ? window.api.github.getReleases(project.githubOwner, project.githubRepo)
+          : Promise.resolve({ success: true, releases: [] as any[] })
+      ]);
+      if (statusRes.success && statusRes.status) {
+        setGitStatus(statusRes.status);
+        setCommits(commitsRes.success ? commitsRes.commits || [] : []);
+        setLocalTags(tagsRes.success ? tagsRes.tags || [] : []);
+        setGithubReleases(releasesRes.success ? releasesRes.releases || [] : []);
       } else {
         setGitStatus(null);
+        setGitError(statusRes.error || 'Не удалось получить статус Git.');
       }
     } catch (e: any) {
-      // Local Git error
       setGitStatus(null);
+      setGitError(e?.message || 'Не удалось получить статус Git.');
     } finally {
       setIsLoadingGit(false);
     }
@@ -517,6 +534,119 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
       }
     } catch (e: any) {
       showToast(e.message, 'error');
+    } finally {
+      setGitActionLoading(null);
+    }
+  };
+
+  const handleCreateCommitSafe = async (shouldPush: boolean) => {
+    const message = commitMessage.trim();
+    if (!message) {
+      showToast(lang === 'ru' ? 'Введите сообщение коммита.' : 'Enter commit message.', 'error');
+      return;
+    }
+    if (!project.localPath) {
+      showToast(lang === 'ru' ? 'Локальный Git-репозиторий не настроен.' : 'Local Git repository is not configured.', 'error');
+      return;
+    }
+
+    setGitActionLoading('commit');
+    try {
+      for (const filePath of commitFiles) {
+        const copyResult = await window.api!.git.copyFile(filePath, project.localPath);
+        if (!copyResult.success) throw new Error(copyResult.error || 'Не удалось добавить файл в проект.');
+      }
+
+      const commitResult = await window.api!.git.commit(project.localPath, message);
+      if (!commitResult.success) throw new Error(commitResult.error || 'Не удалось создать коммит.');
+
+      if (shouldPush) {
+        const pushResult = await window.api!.git.push(project.localPath);
+        if (!pushResult.success) throw new Error(pushResult.error || 'Не удалось отправить коммит.');
+      }
+
+      showToast(
+        shouldPush
+          ? (lang === 'ru' ? 'Коммит создан и отправлен.' : 'Commit created and pushed.')
+          : (lang === 'ru' ? 'Коммит успешно создан.' : 'Commit created successfully.'),
+        'success'
+      );
+      setCommitMessage('');
+      setCommitFiles([]);
+      await loadGitStatus();
+    } catch (error: any) {
+      showToast(error?.message || (lang === 'ru' ? 'Не удалось создать коммит.' : 'Failed to create commit.'), 'error');
+    } finally {
+      setGitActionLoading(null);
+    }
+  };
+
+  const handleCreateGitHubReleaseSafe = async () => {
+    const normalizedTag = tagName.trim();
+    if (!normalizedTag) {
+      showToast(lang === 'ru' ? 'Введите имя тега.' : 'Enter tag name.', 'error');
+      return;
+    }
+    if (!project.localPath) {
+      showToast(lang === 'ru' ? 'Локальный Git-репозиторий не настроен.' : 'Local Git repository is not configured.', 'error');
+      return;
+    }
+    if (!project.githubOwner || !project.githubRepo) {
+      showToast(lang === 'ru' ? 'GitHub-репозиторий не подключён.' : 'GitHub repository is not connected.', 'error');
+      return;
+    }
+
+    setGitActionLoading('githubRelease');
+    try {
+      const [localValidation, githubValidation] = await Promise.all([
+        window.api!.git.validateRelease(project.localPath, normalizedTag),
+        window.api!.github.validateRepositoryAccess(project.githubOwner, project.githubRepo)
+      ]);
+      if (!localValidation.success) throw new Error(localValidation.error || 'Не удалось проверить локальный репозиторий.');
+      if (!githubValidation.success) throw new Error(githubValidation.error || 'Не удалось проверить доступ к GitHub.');
+
+      const tagResult = await window.api!.git.tag(project.localPath, normalizedTag, tagMessage);
+      if (!tagResult.success) throw new Error(tagResult.error || 'Не удалось создать тег.');
+
+      const pushResult = await window.api!.git.pushTag(project.localPath, normalizedTag);
+      if (!pushResult.success) throw new Error(pushResult.error || 'Не удалось опубликовать тег.');
+
+      const releaseResult = await window.api!.github.createRelease(project.githubOwner, project.githubRepo, {
+        tag_name: normalizedTag,
+        name: releaseTitle.trim() || normalizedTag,
+        body: tagMessage,
+        draft: isDraft,
+        prerelease: isPrerelease
+      });
+      if (!releaseResult.success || !releaseResult.release) {
+        throw new Error(releaseResult.error || 'Не удалось создать GitHub-релиз.');
+      }
+
+      for (const filePath of releaseFiles) {
+        const fileName = filePath.split(/[\\/]/).pop() || 'asset';
+        const uploadResult = await window.api!.github.uploadReleaseAsset(
+          project.githubOwner,
+          project.githubRepo,
+          releaseResult.release.id,
+          filePath,
+          fileName
+        );
+        if (!uploadResult.success) {
+          showToast(uploadResult.error || `Не удалось загрузить ${fileName}.`, 'error');
+        }
+      }
+
+      showToast(lang === 'ru' ? 'Тег и релиз успешно опубликованы.' : 'Tag and release published successfully!', 'success');
+      setTagName('');
+      setTagMessage('');
+      setReleaseTitle('');
+      setReleaseFiles([]);
+      setIsDraft(false);
+      setIsPrerelease(false);
+      await loadGitStatus();
+      if (isGitHubConnected && isGitHubOnline) await loadDashboardData();
+    } catch (error: any) {
+      showToast(error?.message || (lang === 'ru' ? 'Не удалось опубликовать релиз.' : 'Failed to publish release.'), 'error');
     } finally {
       setGitActionLoading(null);
     }
@@ -854,9 +984,35 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
           </div>
         ) : gitStatus ? (
           <div className="space-y-6">
+            <div className="grid grid-cols-2 xl:grid-cols-5 gap-3">
+              {[
+                { label: lang === 'ru' ? 'Ветка' : 'Branch', value: gitStatus.branch || '—', icon: Icons.GitBranch },
+                { label: lang === 'ru' ? 'Изменено' : 'Changed', value: `${gitStatus.changedCount || 0}`, icon: Icons.FilePenLine },
+                { label: lang === 'ru' ? 'Неотслеживаемые' : 'Untracked', value: `${gitStatus.untrackedCount || 0}`, icon: Icons.FileQuestion },
+                { label: lang === 'ru' ? 'Впереди origin' : 'Ahead of origin', value: `${gitStatus.ahead || 0}`, icon: Icons.ArrowUp },
+                { label: lang === 'ru' ? 'Позади origin' : 'Behind origin', value: `${gitStatus.behind || 0}`, icon: Icons.ArrowDown }
+              ].map(item => (
+                <div key={item.label} className="glass-card p-3.5 flex items-center gap-3">
+                  <div className="p-2 rounded-xl accent-bg-10 accent-text">
+                    <item.icon className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">{item.label}</div>
+                    <div className="text-sm font-mono font-bold text-white truncate">{item.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
             
             {/* Git quick action buttons */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <button
+                onClick={() => setIsCommitModalOpen(true)}
+                className="p-3 btn-accent flex items-center justify-center gap-2 cursor-pointer text-xs font-semibold"
+              >
+                <Icons.GitCommitHorizontal className="w-5 h-5" />
+                <span>{lang === 'ru' ? 'Новый коммит' : 'New Commit'}</span>
+              </button>
               <button
                 onClick={() => window.api!.git.openFolder(project.localPath!)}
                 className="p-3 glass-card glass-card-hover flex items-center gap-3 cursor-pointer text-xs font-semibold"
@@ -912,7 +1068,9 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
                     <div className="space-y-1 pb-2 border-b border-white/5">
                       <div className="text-slate-500">{t.lastCommit}:</div>
                       <div className="font-mono text-[11px] text-slate-300 truncate bg-black/25 p-2 rounded-lg border border-white/5">
-                        {gitStatus.lastCommit}
+                        {gitStatus.lastCommit
+                          ? `${gitStatus.lastCommit.shortHash} — ${gitStatus.lastCommit.message}`
+                          : (lang === 'ru' ? 'Коммитов пока нет' : 'No commits yet')}
                       </div>
                     </div>
 
@@ -920,6 +1078,17 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
                       <div className="flex justify-between items-center">
                         <span className="text-slate-500">Remote:</span>
                         <span className="font-mono text-[10px] text-slate-400 truncate max-w-[240px]" title={gitStatus.remoteUrl}>{gitStatus.remoteUrl}</span>
+                      </div>
+                    )}
+                    {gitStatus.lastPush && (
+                      <div className="space-y-1 pt-2 border-t border-white/5">
+                        <div className="text-slate-500">{lang === 'ru' ? 'Последний push:' : 'Last push:'}</div>
+                        <div className="text-[10px] text-slate-300">
+                          {gitStatus.lastPush.message}
+                          <span className="text-slate-600 ml-2">
+                            {new Date(gitStatus.lastPush.date).toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US')}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -987,7 +1156,7 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
                     <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
                       <button
                         disabled={!commitMessage.trim() || gitActionLoading !== null}
-                        onClick={() => handleCreateCommit(true)}
+                        onClick={() => handleCreateCommitSafe(true)}
                         className="w-full py-2 rounded-xl bg-gradient-to-r from-flux-blue to-flux-indigo text-white text-xs font-bold cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-[0_4px_12px_rgba(91,92,255,0.15)] hover:shadow-[0_6px_18px_rgba(91,92,255,0.25)]"
                       >
                         {gitActionLoading === 'commit' ? (
@@ -1000,7 +1169,7 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
 
                       <button
                         disabled={!commitMessage.trim() || gitActionLoading !== null}
-                        onClick={() => handleCreateCommit(false)}
+                        onClick={() => handleCreateCommitSafe(false)}
                         className="w-full py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs font-bold cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
                       >
                         <Icons.Check className="w-4 h-4 text-slate-400" />
@@ -1123,7 +1292,7 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
                       {isLinked && isGitHubConnected && isGitHubOnline && (
                         <button
                           disabled={!tagName.trim() || gitActionLoading !== null}
-                          onClick={handleCreateGitHubRelease}
+                          onClick={handleCreateGitHubReleaseSafe}
                           className="w-full py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white text-xs font-bold cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-[0_4px_12px_rgba(139,92,246,0.2)]"
                         >
                           {gitActionLoading === 'githubRelease' ? (
@@ -1184,10 +1353,94 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
               ))}
             </div>
 
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <section className="xl:col-span-2 glass-card p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <Icons.History className="w-4 h-4 accent-text" />
+                    <span>{lang === 'ru' ? 'Последние коммиты' : 'Recent Commits'}</span>
+                  </h3>
+                  <span className="text-[10px] font-mono text-slate-500">{commits.length}</span>
+                </div>
+                {commits.length > 0 ? (
+                  <div className="space-y-2 max-h-80 overflow-y-auto pr-1 custom-scrollbar performance-list">
+                    {commits.map(commit => (
+                      <div key={commit.hash} className="p-3 rounded-xl border border-white/5 bg-black/20 hover:bg-white/[0.03] transition-colors">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-xs font-semibold text-slate-200 truncate">{commit.message}</div>
+                            <div className="text-[10px] text-slate-500 mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                              <span className="font-mono accent-text">{commit.shortHash}</span>
+                              <span>{commit.author}</span>
+                              <span>{new Date(commit.date).toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US')}</span>
+                            </div>
+                          </div>
+                          <Icons.GitCommitHorizontal className="w-4 h-4 text-slate-600 shrink-0" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-xs text-slate-500 py-8 text-center">{lang === 'ru' ? 'Коммитов пока нет.' : 'No commits yet.'}</div>
+                )}
+              </section>
+
+              <div className="space-y-6">
+                <section className="glass-card p-5 space-y-4">
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <Icons.Tag className="w-4 h-4 accent-text" />
+                    <span>{lang === 'ru' ? 'Теги' : 'Tags'}</span>
+                  </h3>
+                  <div className="space-y-2 max-h-44 overflow-y-auto custom-scrollbar">
+                    {localTags.length > 0 ? localTags.map(tag => (
+                      <div key={tag.name} className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-black/20 border border-white/5">
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-mono font-bold accent-text truncate">{tag.name}</div>
+                          <div className="text-[9px] text-slate-500 truncate">{tag.message || '—'}</div>
+                        </div>
+                        <span className="text-[9px] text-slate-600 shrink-0">
+                          {tag.date ? new Date(tag.date).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'en-US') : ''}
+                        </span>
+                      </div>
+                    )) : (
+                      <div className="text-[10px] text-slate-500 text-center py-4">{lang === 'ru' ? 'Тегов нет.' : 'No tags.'}</div>
+                    )}
+                  </div>
+                </section>
+
+                <section className="glass-card p-5 space-y-4">
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <Icons.Rocket className="w-4 h-4 accent-text" />
+                    <span>{lang === 'ru' ? 'Релизы GitHub' : 'GitHub Releases'}</span>
+                  </h3>
+                  <div className="space-y-2 max-h-44 overflow-y-auto custom-scrollbar">
+                    {githubReleases.length > 0 ? githubReleases.slice(0, 10).map(release => (
+                      <a
+                        key={release.id}
+                        href={release.htmlUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-black/20 border border-white/5 hover:border-white/10 transition-colors"
+                      >
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-semibold text-slate-200 truncate">{release.name}</div>
+                          <div className="text-[9px] font-mono text-slate-500">{release.tagName}</div>
+                        </div>
+                        <Icons.ExternalLink className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                      </a>
+                    )) : (
+                      <div className="text-[10px] text-slate-500 text-center py-4">{lang === 'ru' ? 'Релизов нет.' : 'No releases.'}</div>
+                    )}
+                  </div>
+                </section>
+              </div>
+            </div>
+
           </div>
         ) : (
           <div className="text-center py-20 border border-dashed border-white/5 rounded-2xl p-6 text-slate-500 text-xs space-y-2">
             <Icons.AlertTriangle className="w-6 h-6 mx-auto text-amber-500/50" />
+            {gitError && <div className="text-amber-300">{gitError}</div>}
             <div>{lang === 'ru' ? 'Локальный Git-репозиторий недоступен или поврежден.' : 'Local Git repository is offline or unreachable.'}</div>
             <p className="text-[10px] text-slate-600 max-w-xs mx-auto">
               {lang === 'ru' 
@@ -1196,6 +1449,69 @@ export const GitHubProjectDashboard: React.FC<GitHubProjectDashboardProps> = ({ 
             </p>
           </div>
         )
+      )}
+
+      {isCommitModalOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/75 backdrop-blur-md p-4 animate-fade-in"
+          onClick={() => setIsCommitModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-[0_30px_80px_rgba(0,0,0,0.65)] p-6 space-y-5"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl accent-bg-15 accent-text">
+                  <Icons.GitCommitHorizontal className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">{lang === 'ru' ? 'Создать коммит' : 'Create Commit'}</h3>
+                  <p className="text-[10px] text-slate-500 mt-0.5">
+                    {lang === 'ru' ? 'Все изменённые файлы будут добавлены через git add -A.' : 'All changed files will be staged with git add -A.'}
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setIsCommitModalOpen(false)} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5">
+                <Icons.X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <textarea
+              autoFocus
+              rows={4}
+              value={commitMessage}
+              onChange={(event) => setCommitMessage(event.target.value)}
+              placeholder={lang === 'ru' ? 'Что изменилось?' : 'What changed?'}
+              className="w-full resize-none rounded-xl border border-white/10 bg-black/35 px-3.5 py-3 text-xs text-white placeholder-slate-600 focus:outline-none accent-focus"
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                disabled={!commitMessage.trim() || gitActionLoading !== null}
+                onClick={async () => {
+                  await handleCreateCommitSafe(false);
+                  setIsCommitModalOpen(false);
+                }}
+                className="py-2.5 rounded-xl btn-secondary text-xs font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Icons.Check className="w-4 h-4" />
+                <span>{lang === 'ru' ? 'Коммит локально' : 'Commit Locally'}</span>
+              </button>
+              <button
+                disabled={!commitMessage.trim() || gitActionLoading !== null}
+                onClick={async () => {
+                  await handleCreateCommitSafe(true);
+                  setIsCommitModalOpen(false);
+                }}
+                className="py-2.5 rounded-xl btn-accent text-xs font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {gitActionLoading === 'commit' ? <Icons.Loader2 className="w-4 h-4 animate-spin" /> : <Icons.Send className="w-4 h-4" />}
+                <span>{lang === 'ru' ? 'Коммит и push' : 'Commit & Push'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

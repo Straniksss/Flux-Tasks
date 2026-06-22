@@ -369,7 +369,7 @@ export const ArchiveView: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto pr-1 space-y-3.5 scrollbar-thin select-none">
+        <div className="flex-1 overflow-y-auto pr-1 space-y-3.5 scrollbar-thin select-none performance-list">
           {archivedTasks.map((task) => {
             const proj = projects.find(p => p.id === task.projectId);
             return (

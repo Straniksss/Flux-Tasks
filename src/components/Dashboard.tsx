@@ -214,7 +214,7 @@ export const Dashboard: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1">
           <h2 className="text-3xl font-display font-medium text-white tracking-tight">
-            {getGreeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-400 to-[#ff5ad9]">developer</span>
+            {getGreeting()}, <span className="text-gradient">developer</span>
           </h2>
           <p className="text-xs text-slate-400/80 font-medium">
             {new Date().toLocaleDateString(lang === 'ru' ? 'ru-RU' : lang === 'uk' ? 'uk-UA' : 'en-US', {
@@ -238,7 +238,7 @@ export const Dashboard: React.FC = () => {
             className="btn-secondary py-2 px-3.5 flex items-center gap-2 text-xs"
             title={getTranslation(lang, 'notes')}
           >
-            <Icons.StickyNote className="w-4 h-4 text-[#ff52df]" />
+            <Icons.StickyNote className="w-4 h-4 accent-text" />
           </button>
 
           <button 
@@ -265,7 +265,7 @@ export const Dashboard: React.FC = () => {
             
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2">
-                <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">{getTranslation(lang, 'progressTrend')}</span>
+                <span className="text-[10px] font-bold accent-text uppercase tracking-widest">{getTranslation(lang, 'progressTrend')}</span>
                 <h3 className="text-xl font-display font-medium text-white tracking-tight">
                   {lang === 'ru' ? 'Прогресс текущего спринта' : lang === 'uk' ? 'Прогрес поточного спринту' : 'Current Sprint Progress'}
                 </h3>
@@ -384,7 +384,7 @@ export const Dashboard: React.FC = () => {
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className="text-xs font-medium text-white truncate block hover:text-indigo-400 transition-colors">{t.title}</span>
+                          <span className="text-xs font-medium text-white truncate block accent-hover-text transition-colors">{t.title}</span>
                           <span className="text-[10px] text-slate-500 truncate block mt-0.5">
                             {t.projectId ? safeProjects.find(p => p.id === t.projectId)?.name || 'General' : 'General'}
                           </span>
@@ -431,12 +431,12 @@ export const Dashboard: React.FC = () => {
               {(upcomingReleases ?? []).map(rel => (
                 <div key={rel.id} className="flex items-start gap-3 relative group">
                   <div className="shrink-0 mt-0.5">
-                    <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shadow-[0_0_8px_rgba(91,92,255,0.6)]" />
+                    <div className="w-2 h-2 rounded-full accent-bg accent-glow mt-1.5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-1.5">
                       <span className="text-xs font-semibold text-white truncate">{rel.name}</span>
-                      <span className="text-[9px] font-mono text-indigo-400 font-bold bg-indigo-500/10 px-1 rounded">v{rel.version}</span>
+                      <span className="text-[9px] font-mono accent-text font-bold accent-bg-10 px-1 rounded">v{rel.version}</span>
                     </div>
                     <p className="text-[10px] text-slate-400 truncate mt-0.5">{rel.description}</p>
                     <span className="text-[9px] font-mono text-slate-500 mt-1 block">{rel.date}</span>
@@ -469,13 +469,13 @@ export const Dashboard: React.FC = () => {
                         <Icons.Plus className="w-3 h-3" />
                       </div>
                     ) : (
-                      <div className="p-1 rounded-lg bg-indigo-500/10 text-indigo-400">
+                      <div className="p-1 rounded-lg accent-bg-10 accent-text">
                         <Icons.Check className="w-3 h-3" />
                       </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-xs font-medium text-white group-hover:text-indigo-400 transition-colors block truncate">
+                    <span className="text-xs font-medium text-white accent-hover-text transition-colors block truncate">
                       {act.task.title}
                     </span>
                     <p className="text-[10px] text-slate-500 truncate">{act.details}</p>
@@ -508,7 +508,7 @@ export const Dashboard: React.FC = () => {
                 <span className="text-[9px] text-slate-500 font-mono tracking-wide uppercase mt-1 block">Active</span>
               </div>
               <div className="p-2.5 rounded-xl bg-white/[0.015] border border-white/[0.02]">
-                <span className="text-lg font-display font-medium text-emerald-400 block">{completedTasks}</span>
+                <span className="text-lg font-display font-medium accent-text block">{completedTasks}</span>
                 <span className="text-[9px] text-slate-500 font-mono tracking-wide uppercase mt-1 block">Done</span>
               </div>
             </div>

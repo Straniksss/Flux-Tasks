@@ -217,6 +217,7 @@ export interface ElectronAPI {
     createIssue: (owner: string, repo: string, issue: { title: string; body: string; labels: string[] }) => Promise<{ success: boolean; issue?: any; error?: string }>;
     updateIssueStatus: (owner: string, repo: string, number: number, state: 'open' | 'closed') => Promise<{ success: boolean; error?: string }>;
     getReleases: (owner: string, repo: string) => Promise<{ success: boolean; releases?: any[]; error?: string }>;
+    validateRepositoryAccess: (owner: string, repo: string) => Promise<{ success: boolean; repository?: { fullName: string; private: boolean; defaultBranch: string; canPush: boolean }; error?: string }>;
     createRelease: (owner: string, repo: string, releaseData: { tag_name: string; name: string; body: string; draft: boolean; prerelease: boolean }) => Promise<{ success: boolean; release?: any; error?: string }>;
     uploadReleaseAsset: (owner: string, repo: string, releaseId: number, filePath: string, name: string) => Promise<{ success: boolean; asset?: any; error?: string }>;
   };
@@ -224,9 +225,12 @@ export interface ElectronAPI {
   // Git Local API
   git: {
     getStatus: (localPath: string) => Promise<{ success: boolean; status?: any; error?: string }>;
+    getCommits: (localPath: string, limit?: number) => Promise<{ success: boolean; commits?: Array<{ hash: string; shortHash: string; author: string; date: string; message: string }>; error?: string }>;
+    getTags: (localPath: string) => Promise<{ success: boolean; tags?: Array<{ name: string; date: string; message: string }>; error?: string }>;
+    validateRelease: (localPath: string, tagName: string) => Promise<{ success: boolean; repository?: { hasCommits: boolean; branch: string; hasOrigin: boolean; remoteUrl: string }; error?: string }>;
     pull: (localPath: string) => Promise<{ success: boolean; output?: string; error?: string }>;
     push: (localPath: string) => Promise<{ success: boolean; output?: string; error?: string }>;
-    commit: (localPath: string, message: string) => Promise<{ success: boolean; output?: string; error?: string }>;
+    commit: (localPath: string, message: string) => Promise<{ success: boolean; output?: string; commit?: { hash: string; shortHash: string; author: string; date: string; message: string }; error?: string }>;
     tag: (localPath: string, tagName: string, message?: string) => Promise<{ success: boolean; output?: string; error?: string }>;
     pushTag: (localPath: string, tagName: string) => Promise<{ success: boolean; output?: string; error?: string }>;
     copyFile: (sourcePath: string, destDirectory: string) => Promise<{ success: boolean; destPath?: string; error?: string }>;

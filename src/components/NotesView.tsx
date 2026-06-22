@@ -168,7 +168,7 @@ export const NotesView: React.FC = () => {
             <div className="h-5 flex items-center justify-between text-[10px] font-mono select-none">
               <span className="text-slate-500">{getTranslation(lang, 'scratchMode')}</span>
               {saveStatus && (
-                <span className="text-emerald-400 flex items-center gap-1 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/10">
+                <span className="accent-text flex items-center gap-1 accent-bg-10 px-2 py-0.5 rounded border accent-border-10">
                   <Icons.CloudCheck className="w-3.5 h-3.5" />
                   <span>{saveStatus}</span>
                 </span>

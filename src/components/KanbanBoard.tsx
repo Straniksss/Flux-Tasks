@@ -15,9 +15,7 @@ export const KanbanBoard: React.FC = () => {
     filters,
     selectedProjectViewId,
     selectedTagViewName,
-    updateSettings,
-    projectTab,
-    setProjectTab
+    updateSettings
   } = useStore();
 
   const lang = settings.language;
@@ -240,26 +238,6 @@ export const KanbanBoard: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-3">
-          {/* Project View / Git View switcher */}
-          {selectedProjectViewId && settings.enableGitIntegration !== 'false' && (
-            <div className="flex items-center gap-1 bg-white/[0.03] border border-white/5 rounded-lg p-0.5 text-xs text-slate-400">
-              <button
-                onClick={() => setProjectTab('tasks')}
-                className={`px-2.5 py-1 rounded-md font-semibold transition-all flex items-center gap-1 cursor-pointer duration-200 ${projectTab === 'tasks' ? 'bg-white/10 text-white shadow-sm' : 'hover:text-slate-200'}`}
-              >
-                <Icons.CheckSquare className="w-3.5 h-3.5" />
-                <span>{lang === 'ru' ? 'Задачи' : lang === 'uk' ? 'Завдання' : 'Tasks'}</span>
-              </button>
-              <button
-                onClick={() => setProjectTab('git')}
-                className={`px-2.5 py-1 rounded-md font-semibold transition-all flex items-center gap-1 cursor-pointer duration-200 ${projectTab === 'git' ? 'bg-white/10 text-white shadow-sm' : 'hover:text-slate-200'}`}
-              >
-                <Icons.GitBranch className="w-3.5 h-3.5" />
-                <span>Git / GitHub</span>
-              </button>
-            </div>
-          )}
-
           {/* View Mode switcher */}
           <div className="flex items-center gap-1 bg-white/[0.03] border border-white/5 rounded-lg p-0.5 text-xs text-slate-400">
             <button
@@ -343,7 +321,7 @@ export const KanbanBoard: React.FC = () => {
               </div>
 
               {/* Tasks List Column Scroll */}
-              <div className="flex-1 overflow-y-auto p-2.5 space-y-3 custom-scrollbar min-h-[150px]">
+              <div className="flex-1 overflow-y-auto p-2.5 space-y-3 custom-scrollbar min-h-[150px] performance-list">
                 {colTasks.map((task) => {
                   const proj = getProjectDetails(task.projectId);
                   const chk = getChecklistSummary(task);
@@ -405,7 +383,7 @@ export const KanbanBoard: React.FC = () => {
                               <span>{chk.completed}/{chk.total} ({chk.pct}%)</span>
                             </div>
                             <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                              <div className="h-full bg-emerald-400 rounded-full transition-all" style={{ width: `${chk.pct}%` }} />
+                              <div className="h-full accent-bg rounded-full transition-all" style={{ width: `${chk.pct}%` }} />
                             </div>
                           </div>
                         )}

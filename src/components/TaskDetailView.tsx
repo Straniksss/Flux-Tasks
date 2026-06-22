@@ -354,14 +354,14 @@ export const TaskDetailView: React.FC = () => {
                   type="text"
                   value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
-                  className="w-full py-2 px-3 text-lg font-display font-medium rounded-lg border border-white/5 bg-black/45 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400"
+                  className="w-full py-2 px-3 text-lg font-display font-medium rounded-lg border border-white/5 bg-black/45 text-white placeholder-slate-500 focus:outline-none accent-focus"
                 />
                 
                 <textarea
                   rows={8}
                   value={editedDesc}
                   onChange={(e) => setEditedDesc(e.target.value)}
-                  className="w-full p-3 text-xs font-mono rounded-lg border border-white/5 bg-black/45 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-400"
+                  className="w-full p-3 text-xs font-mono rounded-lg border border-white/5 bg-black/45 text-slate-200 placeholder-slate-500 focus:outline-none accent-focus"
                   placeholder="Markdown description or detailed specs..."
                 />
 
@@ -374,7 +374,7 @@ export const TaskDetailView: React.FC = () => {
                   </button>
                   <button
                     onClick={handleSaveDocs}
-                    className="py-1 px-4.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950"
+                    className="py-1 px-4.5 rounded-lg text-xs font-bold btn-accent"
                   >
                     {getTranslation(lang, 'saveTask')}
                   </button>
@@ -423,7 +423,7 @@ export const TaskDetailView: React.FC = () => {
                       type="checkbox"
                       checked={item.done}
                       onChange={(e) => handleToggleCheck(item.id, e.target.checked)}
-                      className="w-4 h-4 rounded border-white/10 bg-slate-900 text-emerald-500 focus:ring-opacity-0 cursor-pointer"
+                      className="w-4 h-4 rounded border-white/10 bg-slate-900 accent-text focus:ring-opacity-0 cursor-pointer"
                     />
                     <span className={`text-xs ${item.done ? 'line-through text-slate-500' : 'text-slate-200'}`}>
                       {item.text}
@@ -446,7 +446,7 @@ export const TaskDetailView: React.FC = () => {
                   placeholder={getTranslation(lang, 'addChecklistItem')}
                   value={newCheckItem}
                   onChange={(e) => setNewCheckItem(e.target.value)}
-                  className="flex-1 py-1.5 px-3 rounded-lg border border-white/5 glass-input focus:border-emerald-500"
+                  className="flex-1 py-1.5 px-3 rounded-lg border border-white/5 glass-input accent-focus"
                 />
                 <button type="submit" className="py-1 px-3 text-xs btn-secondary shrink-0 rounded-lg cursor-pointer">
                   Ok
@@ -738,7 +738,7 @@ export const TaskDetailView: React.FC = () => {
               <select
                 value={selectedTask.projectId}
                 onChange={(e) => handleFieldChange('projectId', e.target.value, 'Linked project re-assigned')}
-                className="w-full py-1.5 px-2.5 rounded-lg border border-white/5 bg-black/35 text-xs text-white focus:outline-none focus:border-emerald-500"
+                className="w-full py-1.5 px-2.5 rounded-lg border border-white/5 bg-black/35 text-xs text-white focus:outline-none accent-focus"
               >
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>{p.name}</option>
@@ -815,7 +815,7 @@ export const TaskDetailView: React.FC = () => {
                         type="button"
                         onClick={handleCreateGitHubIssue}
                         disabled={isCreatingIssue}
-                        className="w-full py-1.5 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold text-center cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full py-1.5 px-3 rounded-lg btn-accent-soft text-[10px] font-semibold text-center cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isCreatingIssue
                           ? (lang === 'ru' ? 'Создание...' : lang === 'uk' ? 'Створення...' : 'Creating...')
@@ -869,7 +869,7 @@ export const TaskDetailView: React.FC = () => {
                   }, 'Updated developer notes');
                 }
               }}
-              className="w-full p-2.5 rounded-xl border border-white/5 glass-input focus:border-emerald-500 font-mono"
+              className="w-full p-2.5 rounded-xl border border-white/5 glass-input accent-focus font-mono"
             />
           </div>
 

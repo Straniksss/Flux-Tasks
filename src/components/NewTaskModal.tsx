@@ -239,7 +239,7 @@ export const NewTaskModal: React.FC = () => {
         {/* Modal Top Header */}
         <div className="p-4 border-b border-white/5 flex items-center justify-between bg-[#071126]/30 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg outline outline-1 outline-white/20 flex items-center justify-center bg-gradient-to-tr from-emerald-500 to-cyan-500 shadow-md">
+            <div className="w-8 h-8 rounded-lg outline outline-1 outline-white/20 flex items-center justify-center accent-bg-gradient shadow-md">
               <Icons.SquarePen className="w-4 h-4 text-slate-950 stroke-[2.5]" />
             </div>
             <div>
@@ -261,7 +261,7 @@ export const NewTaskModal: React.FC = () => {
           {/* STEP 1: TASK TYPE SELECTION CARD MATRIX */}
           <div className="space-y-3 select-none">
             <h4 className="text-xs font-semibold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
-              <span className="text-emerald-400 font-bold">01.</span>
+              <span className="accent-text font-bold">01.</span>
               <span>{getTranslation(lang, 'chooseType')}</span>
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -292,7 +292,7 @@ export const NewTaskModal: React.FC = () => {
                     </div>
                     {/* Active Checkmark indicator */}
                     {isActive && (
-                      <span className="absolute bottom-2.5 right-2.5 bg-emerald-400/20 text-emerald-400 p-0.5 rounded-full border border-emerald-400/30">
+                      <span className="absolute bottom-2.5 right-2.5 accent-bg-20 accent-text p-0.5 rounded-full accent-border-30">
                         <Icons.Check className="w-3 h-3 stroke-[2.5]" />
                       </span>
                     )}
@@ -305,7 +305,7 @@ export const NewTaskModal: React.FC = () => {
           {/* STEP 2: TIMELINE WORKFLOW STATUS SELECTION */}
           <div className="space-y-3 select-none">
             <h4 className="text-xs font-semibold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
-              <span className="text-emerald-400 font-bold">02.</span>
+              <span className="accent-text font-bold">02.</span>
               <span>{getTranslation(lang, 'chooseStatus')}</span>
             </h4>
             
@@ -338,7 +338,7 @@ export const NewTaskModal: React.FC = () => {
           {/* STEP 3: TITLE, SPECS & METADATA DETAILS */}
           <div className="space-y-4">
             <h4 className="text-xs font-semibold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
-              <span className="text-emerald-400 font-bold">03.</span>
+              <span className="accent-text font-bold">03.</span>
               <span>Task Specification Details</span>
             </h4>
 
@@ -354,7 +354,7 @@ export const NewTaskModal: React.FC = () => {
                     placeholder={getTranslation(lang, 'taskTitlePlaceholder')}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full py-2.5 px-3.5 rounded-xl border border-white/5 bg-[#071126]/30 border-b border-white/[0.06] text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/50 shadow-inner"
+                    className="w-full py-2.5 px-3.5 rounded-xl border border-white/5 bg-[#071126]/30 border-b border-white/[0.06] text-sm text-white placeholder-slate-500 focus:outline-none accent-focus-50 shadow-inner"
                   />
                 </div>
 
@@ -365,7 +365,7 @@ export const NewTaskModal: React.FC = () => {
                     placeholder={getTranslation(lang, 'taskDescriptionPlaceholder')}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full py-2.5 px-3.5 rounded-xl border border-white/5 bg-[#071126]/30 border-b border-white/[0.06] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/50 font-sans"
+                    className="w-full py-2.5 px-3.5 rounded-xl border border-white/5 bg-[#071126]/30 border-b border-white/[0.06] text-xs text-white placeholder-slate-500 focus:outline-none accent-focus-50 font-sans"
                   />
                 </div>
 
@@ -385,7 +385,7 @@ export const NewTaskModal: React.FC = () => {
                             updated[idx].done = e.target.checked;
                             setDraftChecklist(updated);
                           }}
-                          className="w-3.5 h-3.5 rounded border-white/10 bg-black/45 text-emerald-400 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                          className="w-3.5 h-3.5 rounded border-white/10 bg-black/45 accent-text focus:ring-0 focus:ring-offset-0 cursor-pointer"
                         />
                         <input
                           type="text"
@@ -424,7 +424,7 @@ export const NewTaskModal: React.FC = () => {
                             }
                           }
                         }}
-                        className="flex-1 py-1.5 px-3.5 rounded-lg border border-white/5 bg-[#071126]/30 border-b border-white/[0.06] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/50"
+                        className="flex-1 py-1.5 px-3.5 rounded-lg border border-white/5 bg-[#071126]/30 border-b border-white/[0.06] text-xs text-white placeholder-slate-500 focus:outline-none accent-focus-50"
                       />
                       <button
                         type="button"
@@ -521,7 +521,7 @@ export const NewTaskModal: React.FC = () => {
           {/* STEP 4: OPTIONAL TASK SPECIFICATION BLOCKS */}
           <div className="space-y-4 pt-4 border-t border-white/5">
             <h4 className="text-xs font-semibold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
-              <span className="text-emerald-400 font-bold">04.</span>
+              <span className="accent-text font-bold">04.</span>
               <span>{lang === 'ru' ? 'Дополнительные спецификации (промты, код, файлы)' : 'Optional Specifications (Prompts, Code, Files)'}</span>
             </h4>
 
@@ -682,7 +682,7 @@ export const NewTaskModal: React.FC = () => {
                   <div
                     onDragOver={(e) => { e.preventDefault(); }}
                     onDrop={handleFileDropSync}
-                    className="border border-dashed border-white/10 hover:border-emerald-500/40 bg-slate-950/20 hover:bg-emerald-500/[0.02] p-3 rounded-lg text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-1 relative group mt-2"
+                    className="border border-dashed border-white/10 accent-hover-bg bg-slate-950/20 p-3 rounded-lg text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-1 relative group mt-2"
                   >
                     <input
                       type="file"
@@ -738,7 +738,7 @@ export const NewTaskModal: React.FC = () => {
             className={`py-2 px-5 rounded-xl text-xs font-semibold text-slate-950 flex items-center gap-1.5 transform active:scale-95 transition-all cursor-pointer ${
               title.trim() 
                 ? 'btn-primary' 
-                : 'bg-emerald-500/20 text-emerald-400/30 cursor-not-allowed border border-emerald-400/10'
+                : 'accent-bg-20 accent-text-muted cursor-not-allowed border border-emerald-400/10'
             }`}
           >
             <Icons.Check className="w-3.5 h-3.5 stroke-[2.5]" />

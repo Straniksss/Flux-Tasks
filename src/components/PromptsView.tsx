@@ -108,7 +108,7 @@ export const PromptsView: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-display font-semibold text-white tracking-tight flex items-center gap-2">
-            <Icons.Cpu className="w-5 h-5 text-indigo-400" />
+            <Icons.Cpu className="w-5 h-5 accent-text" />
             <span>🤖 {lang === 'ru' ? 'Библиотека промптов' : lang === 'uk' ? 'Бібліотека промптів' : 'AI Prompt Library'}</span>
           </h2>
           <p className="text-xs text-slate-400">
@@ -135,7 +135,7 @@ export const PromptsView: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={lang === 'ru' ? 'Поиск промптов по названию, тексту...' : lang === 'uk' ? 'Пошук промптів за назвою, текстом...' : 'Search prompts...'}
-          className="w-full py-1.5 pl-9 pr-4 rounded-xl border border-white/5 glass-input focus:border-indigo-400 px-3 py-1.5"
+          className="w-full py-1.5 pl-9 pr-4 rounded-xl border border-white/5 glass-input accent-focus px-3 py-1.5"
         />
         {searchQuery && (
           <Icons.X 
@@ -158,12 +158,12 @@ export const PromptsView: React.FC = () => {
               placeholder={lang === 'ru' ? 'Название промпта...' : lang === 'uk' ? 'Назва промпту...' : 'Prompt name...'}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="md:col-span-2 py-1.5 px-2.5 rounded-lg border border-white/5 glass-input focus:border-indigo-500"
+              className="md:col-span-2 py-1.5 px-2.5 rounded-lg border border-white/5 glass-input accent-focus"
             />
             <select
               value={newProvider}
               onChange={(e) => setNewProvider(e.target.value as any)}
-              className="py-1.5 px-2.5 rounded-lg border border-white/5 bg-black/45 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+              className="py-1.5 px-2.5 rounded-lg border border-white/5 bg-black/45 text-xs text-white focus:outline-none accent-focus font-mono"
             >
               <option value="gemini">Google Gemini</option>
               <option value="chatgpt">OpenAI ChatGPT</option>
@@ -176,14 +176,14 @@ export const PromptsView: React.FC = () => {
             placeholder={lang === 'ru' ? 'Описание (назначение промпта)...' : lang === 'uk' ? 'Опис (призначення промпту)...' : 'Description (what it does)...'}
             value={newDesc}
             onChange={(e) => setNewDesc(e.target.value)}
-            className="w-full py-1.5 px-2.5 rounded-lg border border-white/5 glass-input focus:border-indigo-500"
+            className="w-full py-1.5 px-2.5 rounded-lg border border-white/5 glass-input accent-focus"
           />
           <input
             type="text"
             placeholder={lang === 'ru' ? 'Теги (через запятую)...' : lang === 'uk' ? 'Теги (через кому)...' : 'Tags (comma separated)...'}
             value={newTagsStr}
             onChange={(e) => setNewTagsStr(e.target.value)}
-            className="w-full py-1.5 px-2.5 rounded-lg border border-white/5 glass-input focus:border-indigo-500"
+            className="w-full py-1.5 px-2.5 rounded-lg border border-white/5 glass-input accent-focus"
           />
           <textarea
             required
@@ -191,7 +191,7 @@ export const PromptsView: React.FC = () => {
             rows={4}
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
-            className="w-full p-2.5 rounded-lg border border-white/5 glass-input focus:border-indigo-500 font-mono"
+            className="w-full p-2.5 rounded-lg border border-white/5 glass-input accent-focus font-mono"
           />
           <div className="flex justify-end gap-2 text-xs">
             <button type="button" onClick={() => setIsOpenAdd(false)} className="px-3 py-1 text-slate-400 hover:text-white">{getTranslation(lang, 'cancel')}</button>

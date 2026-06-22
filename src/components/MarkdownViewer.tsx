@@ -212,7 +212,7 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ text }) => {
           parts.push(<code key={`code-${keyIdx++}`} className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[10px] text-teal-400">{firstMatch.match[2]}</code>);
           currentText = firstMatch.match[3];
         } else if (firstMatch.type === 'link') {
-          parts.push(<a key={`link-${keyIdx++}`} href={firstMatch.match[3]} target="_blank" rel="noopener noreferrer" className="text-[#3bd2ff] hover:text-[#ff52df] underline transition-colors">{firstMatch.match[2]}</a>);
+          parts.push(<a key={`link-${keyIdx++}`} href={firstMatch.match[3]} target="_blank" rel="noopener noreferrer" className="accent-text hover:opacity-80 underline transition-colors">{firstMatch.match[2]}</a>);
           currentText = firstMatch.match[4];
         }
       } else {
@@ -280,7 +280,7 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ text }) => {
       flushTable(i);
       const quoteText = line.substring(line.indexOf('>') + 1).trim();
       elements.push(
-        <blockquote key={i} className="my-2 pl-4 border-l-2 border-[#ff52df] text-xs italic text-slate-400">
+        <blockquote key={i} className="my-2 pl-4 border-l-2 accent-border text-xs italic text-slate-400">
           {parseInlineStyles(quoteText)}
         </blockquote>
       );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { StoreProvider, useStore } from './store';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
@@ -43,14 +43,15 @@ function WorkspaceApp() {
     toast,
     showToast,
     hideToast,
-    projectTab
+    projectTab,
+    setProjectTab
   } = useStore();
 
   const lang = settings.language;
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
   // Sync settings with CSS variables dynamically
-  React.useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
 
     // Apply main accent color
@@ -470,20 +471,20 @@ function WorkspaceApp() {
     return (
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         {/* Soft atmospheric background orbs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full blur-[110px] animate-glow-slow-1" style={glowStyle1} />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] rounded-full blur-[130px] animate-glow-slow-2" style={glowStyle2} />
-        <div className="absolute top-[30%] left-[25%] w-[40%] h-[40%] rounded-full blur-[90px] opacity-70" style={glowStyle3} />
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full motion-composite" style={glowStyle1} />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] rounded-full motion-composite" style={glowStyle2} />
+        <div className="absolute top-[30%] left-[25%] w-[40%] h-[40%] rounded-full opacity-70 motion-composite" style={glowStyle3} />
 
         {/* Dynamic, visually responsive high-fidelity tilted glass sheets replication */}
         <div className="absolute right-[-150px] top-[10%] hidden xl:flex lg:flex-col items-center gap-0 pointer-events-none select-none opacity-25 mix-blend-screen scale-110">
           {/* Backmost card sheet with soft border */}
-          <div className="w-[300px] h-[550px] rounded-[36px] border border-white/[0.015] bg-white/[0.002] shadow-[0_45px_100px_rgba(0,0,0,0.8)] transform rotate-[25deg] translate-y-[120px] -translate-x-[40px] backdrop-blur-[2px] transition-transform duration-1000" />
+          <div className="w-[300px] h-[550px] rounded-[36px] border border-white/[0.015] bg-white/[0.002] shadow-[0_45px_100px_rgba(0,0,0,0.8)] transform rotate-[25deg] translate-y-[120px] -translate-x-[40px]" />
           
           {/* Middle card sheet with purple glowing edge */}
-          <div className="absolute w-[310px] h-[570px] rounded-[40px] border border-[#a855f7]/10 bg-[#030307]/10 shadow-[0_20px_50px_rgba(168,85,247,0.04)] transform rotate-[25deg] translate-y-[60px] -translate-x-[20px] backdrop-blur-[6px]" />
+          <div className="absolute w-[310px] h-[570px] rounded-[40px] border border-[#a855f7]/10 bg-[#030307]/10 shadow-[0_20px_50px_rgba(168,85,247,0.04)] transform rotate-[25deg] translate-y-[60px] -translate-x-[20px]" />
           
           {/* Frontmost card sheet with cyber blue/cyan glow */}
-          <div className="absolute w-[320px] h-[590px] rounded-[44px] border border-[#3f8cff]/15 bg-[#010103]/30 shadow-[0_25px_60px_rgba(63,140,255,0.08)] transform rotate-[25deg] backdrop-blur-[12px] border-t-[#3f8cff]/20" />
+          <div className="absolute w-[320px] h-[590px] rounded-[44px] border border-[#3f8cff]/15 bg-[#010103]/30 shadow-[0_25px_60px_rgba(63,140,255,0.08)] transform rotate-[25deg] border-t-[#3f8cff]/20" />
         </div>
       </div>
     );
@@ -519,7 +520,7 @@ function WorkspaceApp() {
              <button
                onClick={handleRestoreLatestBackup}
                disabled={isRepairing}
-               className="py-2.5 px-4 rounded-xl border border-white/5 bg-emerald-500/20 text-emerald-400 font-bold hover:bg-emerald-500/30 cursor-pointer disabled:opacity-50 text-center"
+               className="py-2.5 px-4 rounded-xl btn-accent-soft font-bold cursor-pointer disabled:opacity-50 text-center"
              >
                {lang === 'ru' ? 'Восстановить бэкап' : lang === 'uk' ? 'Відновити бекап' : 'Restore Last Backup'}
              </button>
@@ -546,14 +547,7 @@ function WorkspaceApp() {
   }
 
   return (
-    <div 
-      className="relative w-screen h-screen overflow-hidden flex flex-col p-0 m-0 text-slate-100 antialiased font-sans transition-all duration-300 bg-[#020512]"
-      style={{
-        // Inject custom accent variable
-        // This coordinates custom color codes throughout any utility elements
-        ['--color-accent' as any]: settings.accentColor
-      }}
-    >
+    <div className="relative w-screen h-screen overflow-hidden flex flex-col p-0 m-0 text-slate-100 antialiased font-sans transition-all duration-300 bg-bg-base">
       {/* Background themed glows */}
       {renderBackgroundGlows()}
 
@@ -585,7 +579,7 @@ function WorkspaceApp() {
                     value={filters.search}
                     onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
                     placeholder={getTranslation(lang, 'searchPlaceholder')}
-                    className="w-full py-1.5 pl-9 pr-4 rounded-xl border border-white/5 bg-slate-900/45 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400"
+                    className="w-full py-1.5 pl-9 pr-4 rounded-xl border border-white/5 bg-slate-900/45 text-xs text-white placeholder-slate-500 focus:outline-none accent-focus"
                   />
                   {filters.search && (
                     <Icons.X 
@@ -662,6 +656,36 @@ function WorkspaceApp() {
 
           {/* DYNAMIC INNER CORE SHEET VIEW RESOLVER */}
           <div className="flex-1 overflow-hidden relative flex flex-col">
+            {!selectedTask && selectedProjectViewId && settings.enableGitIntegration !== 'false' && (
+              <div className="shrink-0 flex items-center justify-center px-6 pt-3">
+                <div className="flex items-center gap-1 rounded-xl border border-white/5 bg-white/[0.03] p-1 text-xs text-slate-400 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setProjectTab('tasks')}
+                    className={`flex items-center gap-1.5 rounded-lg border px-4 py-1.5 font-semibold transition-all cursor-pointer ${
+                      projectTab === 'tasks'
+                        ? 'accent-bg-15 accent-text accent-border-20 shadow-sm'
+                        : 'border-transparent hover:bg-white/5 hover:text-slate-200'
+                    }`}
+                  >
+                    <Icons.CheckSquare className="w-3.5 h-3.5" />
+                    <span>{lang === 'ru' ? 'Задачи' : lang === 'uk' ? 'Завдання' : 'Tasks'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProjectTab('git')}
+                    className={`flex items-center gap-1.5 rounded-lg border px-4 py-1.5 font-semibold transition-all cursor-pointer ${
+                      projectTab === 'git'
+                        ? 'accent-bg-15 accent-text accent-border-20 shadow-sm'
+                        : 'border-transparent hover:bg-white/5 hover:text-slate-200'
+                    }`}
+                  >
+                    <Icons.GitBranch className="w-3.5 h-3.5" />
+                    <span>Git / GitHub</span>
+                  </button>
+                </div>
+              </div>
+            )}
             <ErrorBoundary>
               {selectedTask ? (
               <TaskDetailView />
@@ -704,7 +728,7 @@ function WorkspaceApp() {
                 </div>
 
                 {/* List items row table */}
-                <div className="space-y-2 select-none">
+                <div className="space-y-2 select-none performance-list">
                   {filteredTasks.map((t) => {
                     const proj = projects.find(pr => pr.id === t.projectId);
                     return (
@@ -726,11 +750,11 @@ function WorkspaceApp() {
                                 status: e.target.checked ? 'completed' : 'in_progress'
                               }, `Toggled checklist status inline -> ${e.target.checked ? 'COMPLETED' : 'IN_PROGRESS'}`);
                             }}
-                            className="w-4.5 h-4.5 rounded border-white/15 bg-black/45 text-emerald-400 focus:ring-opacity-0 cursor-pointer"
+                            className="w-4.5 h-4.5 rounded border-white/15 bg-black/45 accent-text focus:ring-opacity-0 cursor-pointer"
                           />
 
                           <div className="min-w-0">
-                            <h4 className="text-xs font-semibold text-slate-200 group-hover:text-emerald-400 transition-colors truncate">
+                            <h4 className="text-xs font-semibold text-slate-200 transition-colors truncate group-hover:![color:var(--accent)]">
                               {t.title}
                             </h4>
                             <div className="flex items-center gap-4 mt-1 text-[10px] text-slate-500">
@@ -832,7 +856,7 @@ function WorkspaceApp() {
 
             {installingUpdate ? (
               <div className="py-3 flex flex-col items-center justify-center gap-2">
-                <Icons.Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+                <Icons.Loader2 className="w-6 h-6 accent-text animate-spin" />
                 <span className="text-xs text-slate-400">{lang === 'ru' ? 'Установка обновления...' : lang === 'uk' ? 'Встановлення оновлення...' : 'Installing update...'}</span>
               </div>
             ) : (
@@ -871,7 +895,7 @@ function WorkspaceApp() {
                       }
                     }
                   }}
-                  className="py-1.5 px-4 rounded-lg bg-emerald-500 text-slate-950 font-bold hover:bg-emerald-400 cursor-pointer active:scale-95 transition-all"
+                  className="py-1.5 px-4 rounded-lg btn-accent font-bold cursor-pointer active:scale-95 transition-all"
                 >
                   {lang === 'ru' ? 'Установить сейчас' : lang === 'uk' ? 'Встановити зараз' : 'Install Now'}
                 </button>
@@ -885,7 +909,7 @@ function WorkspaceApp() {
       {toast && (
         <div className="fixed bottom-6 right-6 z-[100] p-4 rounded-xl border border-white/10 bg-slate-900/90 backdrop-blur-xl shadow-2xl flex items-center gap-3 animate-fade-in max-w-sm select-none">
           {toast.type === 'error' && <Icons.AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />}
-          {toast.type === 'success' && <Icons.CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />}
+          {toast.type === 'success' && <Icons.CheckCircle className="w-5 h-5 accent-text shrink-0" />}
           {toast.type === 'info' && <Icons.Info className="w-5 h-5 text-sky-500 shrink-0" />}
           <div className="text-xs font-medium text-slate-200 pr-4 leading-normal">{toast.message}</div>
           <button
