@@ -1,285 +1,320 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Flux Tasks Banner" width="100%">
+  <img src="assets/banner.png" alt="Баннер Flux Tasks" width="100%">
 </p>
 
 <div align="center">
 
 # 🌊 Flux Tasks
 
-### ✨ Premium Offline-First Project Manager & Development Hub
-*Organize your workflow with absolute privacy, liquid-glass aesthetics, and seamless local productivity.*
+### ✨ Премиальный автономный менеджер проектов и центр разработки
+*Организуйте рабочий процесс с абсолютной конфиденциальностью, эстетикой жидкого стекла и удобной локальной работой.*
 
 [![Electron](https://img.shields.io/badge/Electron-42.4-47848F?style=for-the-badge&logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![SQLite](https://img.shields.io/badge/SQLite-Local-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![Offline First](https://img.shields.io/badge/Offline--First-Secured-7CFFC4?style=for-the-badge)](https://github.com/Straniksss/Flux-Tasks)
+[![SQLite](https://img.shields.io/badge/SQLite-Локально-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Offline First](https://img.shields.io/badge/Offline--First-Защищено-7CFFC4?style=for-the-badge)](https://github.com/Straniksss/Flux-Tasks)
 
 ---
 
-[Key Features](#-key-features) • [Tech Stack](#-technology-stack) • [GitHub & Offline Mode](#-github--offline-first-flexibility) • [Detailed Integration](#-detailed-github--git-integration-points) • [Installation](#-getting-started) • [Development & Build](#%EF%B8%8F-development--build-guide) • [OTA Updates & Releases](#-automated-releases--ota) • [Security & Privacy](#-privacy-by-design)
+[Ключевые возможности](#-ключевые-возможности) • [Технологии](#-технологический-стек) • [GitHub и автономный режим](#-github-и-гибкий-автономный-режим) • [Подробности интеграции](#-подробная-интеграция-с-github-и-git) • [Установка](#️-начало-работы) • [Разработка и сборка](#️-руководство-по-разработке-и-сборке) • [OTA-обновления и релизы](#-автоматизированные-релизы-и-ota) • [Безопасность и конфиденциальность](#-конфиденциальность-по-умолчанию)
 
 </div>
 
 ---
 
-## 🚀 About Flux Tasks
+## 🚀 О Flux Tasks
 
-**Flux Tasks** is a premium, offline-first project management application designed specifically for developers, creators, and teams who value speed, privacy, and rich aesthetics. 
+**Flux Tasks** — премиальное автономное приложение для управления проектами, созданное специально для разработчиков, авторов и команд, которые ценят скорость, конфиденциальность и выразительный дизайн.
 
-Unlike traditional project management tools, Flux Tasks stores **100% of your data locally** on your machine. No cloud databases, no tracking, no mandatory subscriptions. Just pure, instant desktop performance wrapped in a gorgeous liquid-glass user interface.
+В отличие от традиционных инструментов управления проектами, Flux Tasks хранит **100% ваших данных локально** на вашем компьютере. Никаких облачных баз данных, отслеживания и обязательных подписок. Только чистая и быстрая работа настольного приложения в великолепном интерфейсе в стиле жидкого стекла.
 
-Additionally, Flux Tasks features an **optional GitHub integration** using a streamlined Personal Access Token (PAT) flow. Link your local projects to GitHub repositories, track remote releases, and sync issues—all while retaining the ability to work entirely offline.
-
----
-
-## 🔌 GitHub & Offline-First Flexibility
-
-Flux Tasks is architected from the ground up to place full ownership of data in your hands. You don't need a GitHub account, a token, or even an active internet connection to use the core system.
-
-### 🛡️ 100% Offline Mode (No GitHub Connected)
-When used entirely offline or without a linked GitHub account, all features remain fully functional:
-* **Local Projects & Roadmaps**: Create and manage local projects and milestones without any network requests.
-* **Smart Tasks & Checklists**: Create bugs, features, refactors, docs, or AI prompts stored directly in your local SQLite database.
-* **Local Code Snippets**: Save and edit code fragments with syntax highlighting.
-* **Local Attachments**: Import and open project resources (images, PDFs, ZIP archives) locally.
-* **Local Backups & Exports**: Export data to Markdown, JSON, HTML, or CSV, and create/restore local database backups.
-
-### 🐙 Optional GitHub Integration (When Connected)
-If you decide to link a project to a GitHub repository, you get access to advanced repository metrics:
-* **Repository Dashboard**: View stars, forks, open issues, PR counts, default branch, and last push date directly in the app.
-* **Issues Integration**: Synchronize states, import GitHub issues into local tasks, or automatically create GitHub issues from your tasks.
-* **Local Git Actions**: Perform `commit`, `pull`, `push`, and `tag` commands, or launch a terminal directly in your project folder.
-* **Release Timeline Viewer**: Render a read-only timeline of your repository's GitHub Releases history.
-* **High-Level Security**: Your Personal Access Token (PAT) is never stored in plain text or shared with the renderer; it is securely encrypted using Electron's `safeStorage` API and stays safely inside your local SQLite DB.
+Кроме того, Flux Tasks поддерживает **необязательную интеграцию с GitHub** через удобный процесс подключения персонального токена доступа (PAT). Связывайте локальные проекты с репозиториями GitHub, отслеживайте удалённые релизы и синхронизируйте задачи, сохраняя при этом возможность работать полностью автономно.
 
 ---
 
-## 🐙 Detailed GitHub & Git Integration Points
+## 🔌 GitHub и гибкий автономный режим
 
-For developers looking to understand where and how Git and GitHub are integrated across the Flux Tasks codebase, here is a detailed breakdown:
+Архитектура Flux Tasks изначально спроектирована так, чтобы все права на данные оставались у вас. Для работы с основными возможностями не нужны ни учётная запись GitHub, ни токен, ни даже активное подключение к интернету.
 
-### 1. Connection & Token Security (`electron/git-github.ts`)
-* **Settings Panel Integration (`src/components/GitHubSettings.tsx`)**: Prompts the user to create a Personal Access Token (PAT) via a pre-filled GitHub scopes link, connects the account, and displays profile details (username, avatar, scopes, list of repositories).
-* **Electron safeStorage Encryption**: When the user connects their GitHub account, the PAT is transferred to the main process, encrypted using OS-level keychains via Electron's `safeStorage` API, and saved as a hexadecimal string in the local SQLite settings table.
-* **Security Isolation**: The decrypted token is **never** sent back to the frontend renderer or logged, completely protecting it from cross-site scripting (XSS) extraction.
+### 🛡️ Полностью автономный режим (без подключения к GitHub)
 
-### 2. Repository Dashboard (`src/components/GitHubProjectDashboard.tsx`)
-* **Dashboard Tab**: Renders repository metadata fetched via the GitHub REST API, showing:
-  * Open issues count (excluding Pull Requests) and Pull Requests count.
-  * Stars and forks counters.
-  * Repository default branch and the last push timestamp.
-  * A shortcut to open the remote repository in the default web browser.
+При полностью автономном использовании или без привязанной учётной записи GitHub все функции остаются доступными:
 
-### 3. Issues Sync & Management
-* **Issues Tab (`src/components/GitHubProjectDashboard.tsx`)**:
-  * **Import Issue**: Resolves issue fields and saves them as a local SQLite task, including labels, description, and status mappings.
-  * **Link Issue**: Links an existing local task to a GitHub issue.
-* **Task Details View (`src/components/TaskDetailView.tsx`)**:
-  * **Linked Issue Card**: Displays the state of the linked issue (open or closed) dynamically in the task properties sidebar.
-  * **Create Issue**: Automatically converts task descriptions, tags, and checklist items to markdown and posts it to GitHub to create a remote issue.
+* **Локальные проекты и дорожные карты**: создавайте локальные проекты и контрольные точки и управляйте ими без сетевых запросов.
+* **Умные задачи и контрольные списки**: создавайте задачи об ошибках, функциях, рефакторинге, документации или ИИ-промптах, которые сохраняются непосредственно в локальной базе данных SQLite.
+* **Локальные фрагменты кода**: сохраняйте и редактируйте фрагменты кода с подсветкой синтаксиса.
+* **Локальные вложения**: импортируйте и открывайте ресурсы проекта — изображения, PDF-файлы и ZIP-архивы — локально.
+* **Локальные резервные копии и экспорт**: экспортируйте данные в Markdown, JSON, HTML или CSV, а также создавайте и восстанавливайте локальные резервные копии базы данных.
 
-### 4. Local Git Command execution (`electron/git-github.ts` $\rightarrow$ CLI Spawn)
-* **Local Path Configuration**: By specifying a local folder path in the project editor, the following operations are enabled:
-  * **Git Status**: Parses unstaged, staged, and untracked files using `git status --porcelain`.
-  * **Commit**: Runs `git add -A` and `git commit -m "[message]"` on your files.
-  * **Tag**: Spawns annotated tags using `git tag [name] -m "[message]"`.
-  * **Pull & Push**: Syncs code with the remote repository origin (`git pull`/`git push`).
-  * **Terminal/Folder Launchers**: Spawns PowerShell inside the project directory, or opens it inside the default system File Explorer.
+### 🐙 Необязательная интеграция с GitHub (при подключении)
 
-### 5. Read-Only Releases Timeline (`src/components/GitHubReleasesView.tsx`)
-* **Roadmap Viewer Tab**: Placed inside the roadmap switcher to render version history, release notes, release tags, release states (`Draft`, `Prerelease`, `Latest Stable`), and lists of download assets along with their file sizes and download counts.
-* **Strict Read-Only Access**: All mutation controls (creating releases, editing notes, deleting tags, or uploading binaries) are fully removed from the user interface.
+Если вы решите связать проект с репозиторием GitHub, вам станут доступны расширенные показатели репозитория:
 
-### 6. Command-Line Release Pipeline (`scripts/release.js`)
-* **Decoupled System**: Compiling application packages and publishing update manifests (`latest.json` or `latest-[channel].json`) is restricted to the Node CLI script.
-* **Authentication**: Uses `process.env.GITHUB_TOKEN` or a token configured inside the local `.env` configuration file.
-* **Process**: Compiles files, builds setup installers and portable ZIPs, generates update hashes, and automates creating tags and uploading the assets to GitHub Releases.
+* **Панель репозитория**: просматривайте количество звёзд, форков, открытых задач и запросов на слияние, основную ветку и дату последней отправки изменений прямо в приложении.
+* **Интеграция с Issues**: синхронизируйте состояния, импортируйте задачи GitHub в локальные задачи или автоматически создавайте задачи GitHub на основе локальных.
+* **Локальные действия Git**: выполняйте команды `commit`, `pull`, `push` и `tag` либо запускайте терминал непосредственно в папке проекта.
+* **Хронология релизов**: просматривайте доступную только для чтения хронологию релизов репозитория на GitHub.
+* **Высокий уровень безопасности**: ваш персональный токен доступа (PAT) никогда не хранится в открытом виде и не передаётся процессу рендеринга. Он надёжно шифруется с помощью API `safeStorage` из Electron и хранится в локальной базе данных SQLite.
 
 ---
 
-## ✨ Key Features
+## 🐙 Подробная интеграция с GitHub и Git
 
-### 📋 Smart Task Management
-Create and organize multi-type tasks optimized for development cycles:
-* 🐞 **Bugs**: Document, track, and squash code issues.
-* ✨ **Features**: Plan new functionality with checklist items.
-* 🚀 **Releases**: Group tasks under specific project versions.
-* 🔧 **Refactors**: Keep your codebase clean and structured.
-* 📝 **Documentation**: Draft guidelines and design specs right alongside your code.
-* 🤖 **AI Prompts**: Store, tag, and refine prompts for ChatGPT, Claude, or Gemini.
+Ниже приведено подробное описание того, где и как Git и GitHub интегрированы в кодовую базу Flux Tasks.
 
-### 🎨 Liquid-Glass Interface
-Enjoy an interactive experience inspired by **Apple visionOS**, **Arc Browser**, and **Linear**:
-* **Aero Glass & Acrylic Blur**: Beautiful backdrop filters that blend with your desktop environment.
-* **Dynamic HSL Gradients**: Curated color palettes with smooth interactive states.
-* **Micro-Animations**: Fluid transitions powered by Framer Motion.
-* **Typographic Harmony**: Structured typography with premium system font fallbacks.
+### 1. Подключение и безопасность токена (`electron/git-github.ts`)
 
-### 🛣 Timeline & Roadmaps
-Plan and visualize your development trajectory:
-* Track versions, milestones, and release goals.
-* **Release Timeline Switcher**: Instantly switch between checking local SQLite milestones and pulling GitHub releases in real time.
+* **Интеграция с панелью настроек (`src/components/GitHubSettings.tsx`)**: предлагает пользователю создать персональный токен доступа (PAT) по ссылке GitHub с заранее выбранными областями доступа, подключает учётную запись и отображает сведения профиля: имя пользователя, аватар, области доступа и список репозиториев.
+* **Шифрование через Electron safeStorage**: когда пользователь подключает учётную запись GitHub, PAT передаётся основному процессу, шифруется с помощью системного хранилища ключей через API `safeStorage` из Electron и сохраняется в виде шестнадцатеричной строки в локальной таблице настроек SQLite.
+* **Изоляция безопасности**: расшифрованный токен **никогда** не отправляется обратно во фронтенд-процесс рендеринга и не записывается в журнал, что полностью защищает его от извлечения с помощью межсайтового скриптинга (XSS).
 
-### 💻 Local Code Snippets & Attachments
-* Keep your code fragments and snippets organized with integrated syntax highlighting for JavaScript, TypeScript, Python, SQL, HTML, CSS, Bash, and PowerShell.
-* Attach PDFs, logs, images, and ZIP files directly to your projects.
+### 2. Панель репозитория (`src/components/GitHubProjectDashboard.tsx`)
 
-### 🔍 Instant Global Search
-* Instantly search across all tasks, descriptions, code snippets, notes, and AI prompts with zero network latency.
+* **Вкладка панели**: отображает метаданные репозитория, полученные через GitHub REST API:
+  * количество открытых задач без учёта запросов на слияние и количество запросов на слияние;
+  * счётчики звёзд и форков;
+  * основную ветку репозитория и время последней отправки изменений;
+  * ссылку для открытия удалённого репозитория в браузере по умолчанию.
+
+### 3. Синхронизация задач и управление ими
+
+* **Вкладка задач (`src/components/GitHubProjectDashboard.tsx`)**:
+  * **Импорт задачи**: обрабатывает поля задачи и сохраняет их как локальную задачу SQLite, включая метки, описание и сопоставление статусов.
+  * **Привязка задачи**: связывает существующую локальную задачу с задачей GitHub.
+* **Представление сведений о задаче (`src/components/TaskDetailView.tsx`)**:
+  * **Карточка связанной задачи**: динамически отображает состояние связанной задачи — открыта или закрыта — на боковой панели свойств.
+  * **Создание задачи**: автоматически преобразует описание, теги и пункты контрольного списка в Markdown и отправляет их на GitHub для создания удалённой задачи.
+
+### 4. Выполнение локальных команд Git (`electron/git-github.ts` → запуск CLI)
+
+* **Настройка локального пути**: после указания пути к локальной папке в редакторе проекта становятся доступны следующие операции:
+  * **Статус Git**: определяет неиндексированные, индексированные и неотслеживаемые файлы с помощью `git status --porcelain`.
+  * **Коммит**: выполняет `git add -A` и `git commit -m "[сообщение]"` для ваших файлов.
+  * **Тег**: создаёт аннотированные теги с помощью `git tag [имя] -m "[сообщение]"`.
+  * **Получение и отправка изменений**: синхронизирует код с удалённым репозиторием origin (`git pull`/`git push`).
+  * **Запуск терминала и папки**: запускает PowerShell в каталоге проекта или открывает его в системном проводнике по умолчанию.
+
+### 5. Хронология релизов только для чтения (`src/components/GitHubReleasesView.tsx`)
+
+* **Вкладка просмотра дорожной карты**: размещена в переключателе дорожных карт и отображает историю версий, примечания к релизам, теги и состояния релизов (`Черновик`, `Предварительный релиз`, `Последний стабильный`), а также списки загружаемых файлов, их размеры и количество скачиваний.
+* **Строгий режим только для чтения**: все элементы управления изменениями — создание релизов, редактирование примечаний, удаление тегов и загрузка бинарных файлов — полностью удалены из пользовательского интерфейса.
+
+### 6. Конвейер выпуска из командной строки (`scripts/release.js`)
+
+* **Независимая система**: сборка пакетов приложения и публикация манифестов обновлений (`latest.json` или `latest-[канал].json`) выполняются только через CLI-скрипт Node.
+* **Аутентификация**: используется `process.env.GITHUB_TOKEN` или токен, заданный в локальном конфигурационном файле `.env`.
+* **Процесс**: компилирует файлы, создаёт установщики и переносимые ZIP-архивы, генерирует хеши обновлений, а также автоматизирует создание тегов и загрузку файлов в GitHub Releases.
 
 ---
 
-## 🏗 Technology Stack
+## ✨ Ключевые возможности
 
-Flux Tasks is built on modern, lightweight, and high-performance desktop technologies:
+### 📋 Умное управление задачами
 
-* **Runtime**: [Electron 42](https://www.electronjs.org/) (for secure, cross-platform shell integration)
-* **Frontend**: [React 19](https://react.dev/) + [Vite](https://vite.dev/) + [TypeScript](https://www.typescriptlang.org/)
-* **Styling**: [TailwindCSS 4](https://tailwindcss.com/) + Custom Vanilla CSS for backdrop filters and glassmorphism
-* **Database**: [SQLite](https://www.sqlite.org/) (fast, ACID-compliant local database)
-* **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-* **Animations**: [Framer Motion](https://www.framer.com/motion/)
-* **Icons**: [Lucide React](https://lucide.dev/)
+Создавайте и систематизируйте задачи разных типов, оптимизированные для циклов разработки:
+
+* 🐛 **Ошибки**: документируйте, отслеживайте и устраняйте проблемы в коде.
+* ✨ **Функции**: планируйте новую функциональность с помощью контрольных списков.
+* 🚀 **Релизы**: группируйте задачи по конкретным версиям проекта.
+* 🔧 **Рефакторинг**: поддерживайте чистоту и структуру кодовой базы.
+* 📝 **Документация**: создавайте руководства и проектные спецификации рядом с кодом.
+* 🤖 **ИИ-промпты**: храните, помечайте тегами и улучшайте промпты для ChatGPT, Claude или Gemini.
+
+### 🎨 Интерфейс в стиле жидкого стекла
+
+Наслаждайтесь интерактивным интерфейсом, вдохновлённым **Apple visionOS**, **Arc Browser** и **Linear**:
+
+* **Aero Glass и акриловое размытие**: красивые фоновые фильтры, гармонирующие с окружением рабочего стола.
+* **Динамические HSL-градиенты**: тщательно подобранные цветовые палитры с плавными интерактивными состояниями.
+* **Микроанимации**: плавные переходы на базе Framer Motion.
+* **Типографическая гармония**: структурированная типографика с качественными резервными системными шрифтами.
+
+### 🛣️ Хронология и дорожные карты
+
+Планируйте и визуализируйте направление разработки:
+
+* отслеживайте версии, контрольные точки и цели релизов;
+* **переключатель хронологии релизов**: мгновенно переключайтесь между локальными контрольными точками SQLite и релизами GitHub, загружаемыми в реальном времени.
+
+### 💻 Локальные фрагменты кода и вложения
+
+* Храните фрагменты кода в упорядоченном виде со встроенной подсветкой синтаксиса для JavaScript, TypeScript, Python, SQL, HTML, CSS, Bash и PowerShell.
+* Прикрепляйте PDF-файлы, журналы, изображения и ZIP-архивы непосредственно к проектам.
+
+### 🔍 Мгновенный глобальный поиск
+
+* Мгновенно выполняйте поиск по всем задачам, описаниям, фрагментам кода, заметкам и ИИ-промптам без сетевых задержек.
 
 ---
 
-## 📊 Workflow Reference
+## 🏗️ Технологический стек
 
-### Task Types
-| Type | Icon | Primary Use Case |
+Flux Tasks создан на базе современных, лёгких и производительных технологий для настольных приложений:
+
+* **Среда выполнения**: [Electron 42](https://www.electronjs.org/) — для безопасной кроссплатформенной интеграции с системой
+* **Фронтенд**: [React 19](https://react.dev/) + [Vite](https://vite.dev/) + [TypeScript](https://www.typescriptlang.org/)
+* **Стилизация**: [TailwindCSS 4](https://tailwindcss.com/) + собственный CSS для фоновых фильтров и эффекта стекла
+* **База данных**: [SQLite](https://www.sqlite.org/) — быстрая локальная база данных с поддержкой ACID
+* **Управление состоянием**: [Zustand](https://github.com/pmndrs/zustand)
+* **Анимации**: [Framer Motion](https://www.framer.com/motion/)
+* **Значки**: [Lucide React](https://lucide.dev/)
+
+---
+
+## 📊 Справочник по рабочему процессу
+
+### Типы задач
+
+| Тип | Значок | Основное назначение |
 | :--- | :---: | :--- |
-| **Bug** | 🐞 | Bug tracking, regression testing, and hotfixes |
-| **Feature** | ✨ | Feature requests, UI improvements, and new capabilities |
-| **Release** | 🚀 | Version targeting, deployment tasks, and change summaries |
-| **Refactor** | 🔧 | Technical debt reduction and code cleanup |
-| **Documentation**| 📝 | System architecture docs, onboarding guides, and user manuals |
-| **AI Prompt** | 🤖 | System instructions, prompt templates, and agent guidelines |
+| **Ошибка** | 🐛 | Отслеживание ошибок, регрессионное тестирование и срочные исправления |
+| **Функция** | ✨ | Запросы функций, улучшения интерфейса и новые возможности |
+| **Релиз** | 🚀 | Планирование версий, задачи развёртывания и сводки изменений |
+| **Рефакторинг** | 🔧 | Сокращение технического долга и очистка кода |
+| **Документация** | 📝 | Документация архитектуры системы, руководства по адаптации и инструкции пользователя |
+| **ИИ-промпт** | 🤖 | Системные инструкции, шаблоны промптов и руководства для агентов |
 
-### Task Statuses
-| Status | Icon | Stage in Pipeline |
+### Статусы задач
+
+| Статус | Значок | Этап процесса |
 | :--- | :---: | :--- |
-| **Planned** | 📌 | Backlogged or scheduled for future iterations |
-| **Waiting** | ⏳ | Blocked, waiting on review, or pending external feedback |
-| **In Progress** | 🚧 | Currently active development |
-| **Testing** | 🧪 | Verification, QA check, or code-review stage |
-| **Completed** | ✅ | Successfully closed and implemented |
-| **Cancelled** | ❌ | Discarded, duplicated, or marked out of scope |
+| **Запланировано** | 📌 | В очереди или запланировано для будущих итераций |
+| **Ожидание** | ⏳ | Заблокировано, ожидает проверки или внешней обратной связи |
+| **В работе** | 🚧 | Активная разработка |
+| **Тестирование** | 🧪 | Проверка, контроль качества или ревью кода |
+| **Завершено** | ✅ | Успешно закрыто и реализовано |
+| **Отменено** | ❌ | Отклонено, продублировано или исключено из области работ |
 
 ---
 
-## 💾 Local Storage Architecture
+## 💾 Архитектура локального хранилища
 
-All data resides safely on your disk. You own your files:
+Все данные надёжно хранятся на вашем диске. Файлы принадлежат вам:
 
 ```text
-%APPDATA%/Flux Tasks/   (Windows)
+%APPDATA%/Flux Tasks/                  (Windows)
 ~/Library/Application Support/Flux Tasks/ (macOS)
-~/.config/Flux Tasks/   (Linux)
+~/.config/Flux Tasks/                 (Linux)
 
-├── tasks.db         # Core SQLite database containing tasks, projects, snippets, and encrypted credentials
-├── backups/         # Auto-generated database checkpoints and backups
-└── exports/         # Markdown, JSON, and CSV project exports
+├── tasks.db         # Основная база данных SQLite с задачами, проектами, фрагментами кода и зашифрованными учётными данными
+├── backups/         # Автоматически создаваемые контрольные копии и резервные копии базы данных
+└── exports/         # Экспорт проектов в Markdown, JSON и CSV
 ```
 
 ---
 
-## ⚙️ Getting Started
+## ⚙️ Начало работы
 
-Installing Flux Tasks is quick and simple.
+Установка Flux Tasks выполняется быстро и просто.
 
-1. **Download the Web Installer**:
-   Download the installer package directly: [Flux Tasks Web Setup (EXE)](https://github.com/Straniksss/Flux-Tasks/releases/download/installer-v1/Flux.Tasks.Web.Setup.exe)
-2. **Run Setup**:
-   Launch `Flux.Tasks.Web.Setup.exe` on your system. The installer will set up all dependencies and prepare the application shell.
-3. **Start Organizing**:
-   Open the app from your Desktop or Start Menu and begin managing your projects offline!
+1. **Скачайте веб-установщик**:
+   загрузите установочный пакет напрямую: [Flux Tasks Web Setup (EXE)](https://github.com/Straniksss/Flux-Tasks/releases/download/installer-v1/Flux.Tasks.Web.Setup.exe).
+2. **Запустите установку**:
+   запустите `Flux.Tasks.Web.Setup.exe`. Установщик настроит все зависимости и подготовит оболочку приложения.
+3. **Начните работу**:
+   откройте приложение с рабочего стола или из меню «Пуск» и управляйте проектами автономно.
+
 ---
 
-## 🛠️ Development & Build Guide
+## 🛠️ Руководство по разработке и сборке
 
-If you are developing or building Flux Tasks locally, follow these steps to set up your environment:
+Чтобы разрабатывать или собирать Flux Tasks локально, настройте окружение следующим образом.
 
-### 1. Prerequisites
-* [Node.js](https://nodejs.org/) (version 18.x or newer)
+### 1. Требования
+
+* [Node.js](https://nodejs.org/) версии 18.x или новее
 * [Git](https://git-scm.com/)
 
-### 2. Configure Environment Variables
-Create a file named `.env` in the root folder of the project, and add the following keys:
+### 2. Настройка переменных окружения
+
+Создайте файл `.env` в корневой папке проекта и добавьте следующие ключи:
+
 ```env
-# GitHub token for release publishing (repo, read:user, workflow scopes)
+# Токен GitHub для публикации релизов (области доступа: repo, read:user, workflow)
 GITHUB_TOKEN=your_personal_access_token_here
 
-# GitHub repository owner and repository name
+# Владелец и имя репозитория GitHub
 GITHUB_OWNER=Straniksss
 GITHUB_REPO=Flux-Tasks
 
-# URL to poll for client-side OTA auto-update checks
+# URL для проверки клиентом автоматических OTA-обновлений
 UPDATE_MANIFEST_URL=https://github.com/Straniksss/Flux-Tasks/releases/latest/download/latest.json
 ```
 
-### 3. Run Locally in Dev Mode
-1. Install node packages:
+### 3. Локальный запуск в режиме разработки
+
+1. Установите пакеты Node:
+
    ```bash
    npm install
    ```
-2. Start the hot-reloading dev environment:
+
+2. Запустите среду разработки с горячей перезагрузкой:
+
    ```bash
    npm run dev
    ```
-   *This starts the local Vite server and boots the Electron application frame.*
 
-### 4. Build Standalone Installer Locally
-To compile frontend code and build the final executable installer:
+   *Будет запущен локальный сервер Vite и оболочка приложения Electron.*
+
+### 4. Локальная сборка автономного установщика
+
+Чтобы скомпилировать код фронтенда и создать итоговый исполняемый установщик:
+
 ```bash
 npm run build
 ```
-*This produces standalone installers and portable ZIP packages inside the `release/` directory.*
+
+*Автономные установщики и переносимые ZIP-пакеты будут созданы в каталоге `release/`.*
 
 ---
 
-## 🚀 Automated Releases & OTA
+## 🚀 Автоматизированные релизы и OTA
 
-Flux Tasks features a custom-built automation pipeline for compiling, verifying, and publishing updates.
+Flux Tasks содержит собственный автоматизированный конвейер для сборки, проверки и публикации обновлений.
 
-### Release Script (`npm run release`)
-Running `npm run release` prompts you for release metadata:
-1. **Target Version**: (e.g., `1.1.15`, `1.2.0-beta.1`)
-2. **Release Channel**: (`stable`, `beta`, `alpha`, `rc`)
-3. **Release Title**: Heading for the changelog
-4. **Changelog Notes**: Bullet points representing changes
-5. **GitHub Repository**: Target owner/repo (defaults to the setting in `.env` or `Straniksss/Flux-Tasks`)
+### Скрипт выпуска (`npm run release`)
 
-#### What the script does under the hood:
-* Stops active `Flux Tasks.exe` instances to prevent locking files.
-* Bumps target version, automatically stages all changed project files, commits them, and pushes them to your current remote Git branch (`git push origin [branch]`).
-* Builds the React client and compiles Electron main/preload processes via `esbuild`.
-* Bundles files into an `app.asar` archive and validates structure.
-* Calculates SHA256 checksums and file sizes.
-* Generates OTA (Over-the-Air) update manifests:
-  * Stable releases publish/overwrite `latest.json` and `latest-stable.json`.
-  * Pre-releases (beta, alpha, rc) write to isolated manifests (e.g., `latest-beta.json`).
-* If a `GITHUB_TOKEN` is found, automatically creates a GitHub Release, tags the repository, cleans up duplicate assets, and uploads the manifest files, `app.asar`, portable ZIP, and NSIS setup installer.
+При выполнении `npm run release` скрипт запрашивает метаданные релиза:
 
----
+1. **Целевая версия**: например, `1.1.15` или `1.2.0-beta.1`
+2. **Канал релиза**: `stable`, `beta`, `alpha` или `rc`
+3. **Название релиза**: заголовок списка изменений
+4. **Примечания к выпуску**: маркированный список изменений
+5. **Репозиторий GitHub**: целевой владелец/репозиторий — по умолчанию значение из `.env` или `Straniksss/Flux-Tasks`
 
-## 🔒 Privacy by Design
+#### Что скрипт делает внутри:
 
-* **Zero Tracking**: No telemetry, no usage analytics, and no external tracking pixels.
-* **Offline-First Storage**: The app behaves 100% identically when you are disconnected from the network.
-* **Secure Token Handling**: When using the optional GitHub integration:
-  * Personal Access Tokens are encrypted using Electron's OS-level credentials system (`safeStorage`).
-  * Tokens are never stored plain-text, never logged to stdout/files, and never sent to the renderer process.
-  * All GitHub requests are routed through Electron's main process for advanced header security.
+* Останавливает активные экземпляры `Flux Tasks.exe`, чтобы предотвратить блокировку файлов.
+* Обновляет целевую версию, автоматически добавляет все изменённые файлы проекта в индекс, создаёт коммит и отправляет его в текущую удалённую ветку Git (`git push origin [ветка]`).
+* Собирает клиент React и компилирует основной процесс и процесс предварительной загрузки Electron с помощью `esbuild`.
+* Упаковывает файлы в архив `app.asar` и проверяет его структуру.
+* Вычисляет контрольные суммы SHA256 и размеры файлов.
+* Создаёт манифесты OTA-обновлений:
+  * стабильные релизы публикуют или перезаписывают `latest.json` и `latest-stable.json`;
+  * предварительные релизы (`beta`, `alpha`, `rc`) записываются в отдельные манифесты, например `latest-beta.json`.
+* Если найден `GITHUB_TOKEN`, автоматически создаёт релиз GitHub, добавляет тег репозитория, удаляет дубликаты файлов и загружает манифесты, `app.asar`, переносимый ZIP-архив и установщик NSIS.
 
 ---
 
-## 📄 License
+## 🔒 Конфиденциальность по умолчанию
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+* **Никакого отслеживания**: без телеметрии, аналитики использования и внешних пикселей отслеживания.
+* **Автономное хранилище**: приложение работает одинаково как с подключением к сети, так и без него.
+* **Безопасная работа с токенами** при использовании необязательной интеграции с GitHub:
+  * персональные токены доступа шифруются с помощью системного хранилища учётных данных Electron (`safeStorage`);
+  * токены никогда не хранятся в открытом виде, не записываются в стандартный вывод или файлы журналов и не передаются процессу рендеринга;
+  * все запросы к GitHub проходят через основной процесс Electron для дополнительной защиты заголовков.
+
+---
+
+## 📄 Лицензия
+
+Проект распространяется по лицензии MIT. Подробности приведены в файле [LICENSE](LICENSE).
 
 ---
 
 <p align="center">
-  Crafted with ❤️ for developers who love premium aesthetics and privacy.
+  Создано с ❤️ для разработчиков, которые ценят премиальную эстетику и конфиденциальность.
 </p>
