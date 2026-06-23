@@ -14,7 +14,7 @@ Do not create a public GitHub issue for security vulnerabilities.
 
 Instead, contact the maintainer directly:
 
-Email: [bambookeeper0@gmail.com](mailto:security@tech.bamboo-ecosystem.tech)
+Email: [security@tech.bamboo-ecosystem.tech](mailto:security@tech.bamboo-ecosystem.tech)
 
 Please include:
 
